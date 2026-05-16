@@ -59,7 +59,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Speech analysis engine: filler word detection + WPM calculation (TDD)
+- [x] 03-01-PLAN.md — Speech analysis engine: filler word detection + WPM calculation (TDD)
 - [ ] 03-02-PLAN.md — Integrate speech analysis into Upload pipeline + Dashboard display
 
 ### Phase 4: Visual Analysis — Eye Contact & Emotion
@@ -94,6 +94,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Core Infrastructure | 2/2 | Complete | 2026-05-16 |
 | 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
-| 3. Speech & Text Analysis | 0/2 | Planned | - |
+| 3. Speech & Text Analysis | 1/2 | In Progress|  |
 | 4. Visual Analysis | 0/0 | Not started | - |
 | 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |

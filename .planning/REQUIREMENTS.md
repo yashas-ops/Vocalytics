@@ -24,10 +24,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Speech Analysis
 
-- [ ] **SPE-01**: System detects and counts filler words (um, uh, like, basically, literally, you know)
-- [ ] **SPE-02**: System identifies most used filler word
-- [ ] **SPE-03**: System calculates speaking speed in words per minute (WPM)
-- [ ] **SPE-04**: System classifies WPM as slow (<110), good (110-160), or fast (>160)
+- [x] **SPE-01**: System detects and counts filler words (um, uh, like, basically, literally, you know)
+- [x] **SPE-02**: System identifies most used filler word
+- [x] **SPE-03**: System calculates speaking speed in words per minute (WPM)
+- [x] **SPE-04**: System classifies WPM as slow (<110), good (110-160), or fast (>160)
 
 ### Visual Analysis
 
@@ -122,10 +122,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | AUD-02 | Phase 2 | Pending |
 | STT-01 | Phase 2 | Pending |
 | STT-02 | Phase 2 | Pending |
-| SPE-01 | Phase 3 | Pending |
-| SPE-02 | Phase 3 | Pending |
-| SPE-03 | Phase 3 | Pending |
-| SPE-04 | Phase 3 | Pending |
+| SPE-01 | Phase 3 | Complete |
+| SPE-02 | Phase 3 | Complete |
+| SPE-03 | Phase 3 | Complete |
+| SPE-04 | Phase 3 | Complete |
 | VIS-01 | Phase 4 | Pending |
 | VIS-02 | Phase 4 | Pending |
 | VIS-03 | Phase 4 | Pending |
