@@ -19,13 +19,17 @@ A fully local AI-powered Streamlit app that analyzes mock interview videos. The 
 **Depends on**: Nothing (first phase)
 **Requirements**: UI-01
 **Success Criteria** (what must be TRUE):
-  1. User can launch the app with `streamlit run streamlit_app.py` and see a dark-themed interface with working page navigation (Upload, Dashboard, History)
+  1. User can launch the app with `streamlit run app.py` and see a dark-themed interface with working page navigation (Upload, Dashboard, History)
   2. Shared Pydantic data models (`modules/models.py`) define every pipeline stage's input/output types and are importable without circular dependencies
   3. SQLite database initializes with the correct schema on first run (WAL mode enabled)
   4. File management utilities save uploaded videos to `uploads/` immediately (never kept in memory) and clean up `temp/` after pipeline completes
   5. ML model loading uses `@st.cache_resource` so faster-whisper, spaCy, MediaPipe, and DeepFace each load exactly once per session
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 01-01-PLAN.md — Project skeleton, Pydantic data models, SQLite database init
+- [ ] 01-02-PLAN.md — Utilities, Streamlit app shell, dark theme CSS
 
 ### Phase 2: Video Upload, Audio Pipeline & Transcription
 **Goal**: Users can upload videos and get timestamped transcripts — the critical audio-to-text pipeline validated early
@@ -81,7 +85,7 @@ A fully local AI-powered Streamlit app that analyzes mock interview videos. The 
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Infrastructure | 0/0 | Not started | - |
+| 1. Core Infrastructure | 0/2 | Planning | - |
 | 2. Upload, Audio & Transcription | 0/0 | Not started | - |
 | 3. Speech & Text Analysis | 0/0 | Not started | - |
 | 4. Visual Analysis | 0/0 | Not started | - |
