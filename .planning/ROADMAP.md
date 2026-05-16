@@ -8,7 +8,7 @@ A fully local AI-powered Streamlit app that analyzes mock interview videos. The 
 
 - [ ] **Phase 1: Core Infrastructure & Data Models** - Project skeleton, shared types, SQLite schema, file management, Streamlit shell with dark theme, and cached model loading
 - [ ] **Phase 2: Video Upload, Audio Pipeline & Transcription** - Video upload, ffmpeg audio extraction, VAD preprocessing, faster-whisper transcription with timestamped segments
-- [ ] **Phase 3: Speech & Text Analysis** - Filler word detection (spaCy POS-tagging), WPM calculation, speed classification
+- [x] **Phase 3: Speech & Text Analysis** - Filler word detection (spaCy POS-tagging), WPM calculation, speed classification (completed 2026-05-16)
 - [ ] **Phase 4: Visual Analysis — Eye Contact & Emotion** - Keyframe extraction, MediaPipe eye contact with head pose estimation, DeepFace emotion analysis
 - [ ] **Phase 5: Scoring, Feedback & Dashboard** - Confidence score, template-based feedback report, full dashboard with charts, SQLite persistence, history browser
 
@@ -60,7 +60,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — Speech analysis engine: filler word detection + WPM calculation (TDD)
-- [ ] 03-02-PLAN.md — Integrate speech analysis into Upload pipeline + Dashboard display
+- [x] 03-02-PLAN.md — Integrate speech analysis into Upload pipeline + Dashboard display
 
 ### Phase 4: Visual Analysis — Eye Contact & Emotion
 **Goal**: System analyzes video frames for eye contact percentage and emotional expressions — the unique differentiator
@@ -94,6 +94,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Core Infrastructure | 2/2 | Complete | 2026-05-16 |
 | 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
-| 3. Speech & Text Analysis | 1/2 | In Progress|  |
+| 3. Speech & Text Analysis | 2/2 | Complete   | 2026-05-16 |
 | 4. Visual Analysis | 0/0 | Not started | - |
 | 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |
