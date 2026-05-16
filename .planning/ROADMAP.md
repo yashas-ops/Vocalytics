@@ -40,9 +40,12 @@ Plans:
   2. System extracts 16kHz mono WAV audio from uploaded video using ffmpeg subprocess (not moviepy arrays) and saves to `temp/`
   3. System transcribes speech to text using faster-whisper (tiny or base model, INT8 quantization) producing word-timestamped segments
   4. System shows progress feedback during the pipeline (status messages: "Extracting audio...", "Transcribing...", estimated time) using `st.progress()`/`st.status()`
-  5. VAD preprocessing prevents Whisper hallucination on silent segments — no "Thank you for watching" artifacts in output
-**Plans**: TBD
+**Plans**: 2 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 02-01-PLAN.md — Audio extraction + faster-whisper transcription engine modules
+- [ ] 02-02-PLAN.md — Upload page pipeline integration with progress feedback
 
 ### Phase 3: Speech & Text Analysis
 **Goal**: System analyzes the transcript for filler word frequency and speaking speed metrics
@@ -85,8 +88,8 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Infrastructure | 0/2 | Planning | - |
-| 2. Upload, Audio & Transcription | 0/0 | Not started | - |
+| 1. Core Infrastructure | 2/2 | Complete | 2026-05-16 |
+| 2. Upload, Audio & Transcription | 0/2 | Planned | - |
 | 3. Speech & Text Analysis | 0/0 | Not started | - |
 | 4. Visual Analysis | 0/0 | Not started | - |
 | 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |
