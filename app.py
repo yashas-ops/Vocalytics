@@ -318,7 +318,13 @@ def render_dashboard_page():
     with col1:
         st.metric("Confidence Score", "—", help="Coming in Phase 5")
     with col2:
-        st.metric("Eye Contact", "—", help="Coming in Phase 4")
+        eye_contact = st.session_state.get("last_eye_contact")
+        if eye_contact is not None:
+            contact_pct = f"{eye_contact.contact_percentage:.0f}%"
+            st.metric("Eye Contact", contact_pct,
+                      help=f"Based on {eye_contact.total_frames} sampled frames")
+        else:
+            st.metric("Eye Contact", "—", help="Not available — run a video with visible face")
     with col3:
         wpm = f"{speech.wpm:.0f}"
         st.metric("Speaking Speed", f"{wpm} WPM",
@@ -378,6 +384,57 @@ def render_dashboard_page():
                        f"(~1 every {speech.total_words // max(speech.total_filler_count, 1)} words)")
     else:
         st.success("🎯 No filler words detected! Clean speech.")
+
+    # ── Visual Analysis Results ──
+    st.markdown("---")
+    st.markdown("### 👁️ Eye Contact & Emotion Analysis")
+
+    eye_contact = st.session_state.get("last_eye_contact")
+    emotion = st.session_state.get("last_emotion")
+
+    if eye_contact is None and emotion is None:
+        st.info("📹 Visual analysis results will appear here after running an interview "
+                "with a visible face. Return to the Upload page to submit a video.")
+
+    else:
+        col_ec, col_em = st.columns(2)
+
+        with col_ec:
+            if eye_contact is not None and eye_contact.total_frames > 0:
+                pct = eye_contact.contact_percentage
+                st.metric("Eye Contact", f"{pct:.0f}%")
+
+                # Text annotation per D-19
+                if pct >= 70:
+                    st.success(f"✅ Good — maintained eye contact {pct:.0f}% of the time")
+                elif pct >= 40:
+                    st.warning(f"👀 Moderate eye contact ({pct:.0f}%) — try to look at the camera more")
+                else:
+                    st.error(f"📉 Low eye contact ({pct:.0f}%) — practice looking at the camera")
+
+                st.caption(f"Based on {eye_contact.total_frames} sampled frames "
+                           f"({eye_contact.contact_frames} with eye contact)")
+            else:
+                st.metric("Eye Contact", "—")
+                st.info("No face detected — ensure you're visible on camera")
+
+        with col_em:
+            if emotion is not None and emotion.frames_analyzed > 0:
+                st.metric("Dominant Emotion", emotion.dominant_emotion.capitalize())
+
+                # Emotion frequency distribution per D-20
+                if emotion.emotion_distribution:
+                    st.markdown("**Emotion Frequency:**")
+                    import pandas as pd
+                    emotion_df = pd.DataFrame(
+                        list(emotion.emotion_distribution.items()),
+                        columns=["Emotion", "Frequency"]
+                    )
+                    st.dataframe(emotion_df, use_container_width=True, hide_index=True)
+                    st.caption(f"Analyzed across {emotion.frames_analyzed} keyframes")
+            else:
+                st.metric("Dominant Emotion", "—")
+                st.info("Emotion analysis not available")
 
     # Placeholder for future phase results
     st.markdown("---")
