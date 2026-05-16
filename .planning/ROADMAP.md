@@ -74,7 +74,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Visual analysis engine: keyframe extraction, eye contact (MediaPipe PnP), emotion detection (DeepFace) — TDD
+- [x] 04-01-PLAN.md — Visual analysis engine: keyframe extraction, eye contact (MediaPipe PnP), emotion detection (DeepFace) — TDD
 - [ ] 04-02-PLAN.md — Integrate visual analysis into Upload pipeline + Dashboard display
 
 ### Phase 5: Scoring, Feedback & Dashboard
@@ -99,5 +99,5 @@ Plans:
 | 1. Core Infrastructure | 2/2 | Complete | 2026-05-16 |
 | 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
 | 3. Speech & Text Analysis | 2/2 | Complete   | 2026-05-16 |
-| 4. Visual Analysis | 0/2 | Not started | - |
+| 4. Visual Analysis | 1/2 | In progress | - |
 | 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |

@@ -31,9 +31,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Visual Analysis
 
-- [ ] **VIS-01**: System detects eye contact percentage using MediaPipe Face Mesh with head pose estimation
-- [ ] **VIS-02**: System detects dominant emotion from video frames using DeepFace (keyframe-sampled, max 20 frames)
-- [ ] **VIS-03**: System generates emotion frequency distribution
+- [x] **VIS-01**: System detects eye contact percentage using MediaPipe Face Mesh with head pose estimation
+- [x] **VIS-02**: System detects dominant emotion from video frames using DeepFace (keyframe-sampled, max 20 frames)
+- [x] **VIS-03**: System generates emotion frequency distribution
 
 ### Confidence Scoring
 
@@ -126,9 +126,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | SPE-02 | Phase 3 | Complete |
 | SPE-03 | Phase 3 | Complete |
 | SPE-04 | Phase 3 | Complete |
-| VIS-01 | Phase 4 | Pending |
-| VIS-02 | Phase 4 | Pending |
-| VIS-03 | Phase 4 | Pending |
+| VIS-01 | Phase 4 | Complete |
+| VIS-02 | Phase 4 | Complete |
+| VIS-03 | Phase 4 | Complete |
 | SCORE-01 | Phase 5 | Pending |
 | SCORE-02 | Phase 5 | Pending |
 | SCORE-03 | Phase 5 | Pending |
