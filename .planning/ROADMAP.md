@@ -67,11 +67,15 @@ Plans:
 **Depends on**: Phase 2 (needs uploaded video, runs independently of transcript)
 **Requirements**: VIS-01, VIS-02, VIS-03
 **Success Criteria** (what must be TRUE):
-  1. System extracts keyframes from video at configurable intervals using OpenCV (max 20 frames for DeepFace to avoid CPU meltdown)
-  2. System detects eye contact percentage using MediaPipe Face Mesh with PnP head pose estimation (yaw ±15°, pitch ±10°) — not mere face detection
-  3. System detects dominant emotion per keyframe using DeepFace (opencv backend, `enforce_detection=False`) and generates emotion frequency distribution (e.g., "neutral 45%, happy 30%, ...")
-  4. Visual analysis completes on CPU in reasonable time (bounded by max 20 DeepFace frames) and results are stored in typed models
-**Plans**: TBD
+   1. System extracts keyframes from video at configurable intervals using OpenCV (max 20 frames for DeepFace to avoid CPU meltdown)
+   2. System detects eye contact percentage using MediaPipe Face Mesh with PnP head pose estimation (yaw ±15°, pitch ±10°) — not mere face detection
+   3. System detects dominant emotion per keyframe using DeepFace (opencv backend, `enforce_detection=False`) and generates emotion frequency distribution (e.g., "neutral 45%, happy 30%, ...")
+   4. Visual analysis completes on CPU in reasonable time (bounded by max 20 DeepFace frames) and results are stored in typed models
+**Plans**: 2 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Visual analysis engine: keyframe extraction, eye contact (MediaPipe PnP), emotion detection (DeepFace) — TDD
+- [ ] 04-02-PLAN.md — Integrate visual analysis into Upload pipeline + Dashboard display
 
 ### Phase 5: Scoring, Feedback & Dashboard
 **Goal**: Complete analysis pipeline — confidence score, feedback report, full dashboard with visualizations, and persistent history
@@ -95,5 +99,5 @@ Plans:
 | 1. Core Infrastructure | 2/2 | Complete | 2026-05-16 |
 | 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
 | 3. Speech & Text Analysis | 2/2 | Complete   | 2026-05-16 |
-| 4. Visual Analysis | 0/0 | Not started | - |
+| 4. Visual Analysis | 0/2 | Not started | - |
 | 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |
