@@ -116,44 +116,44 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| VID-01 | — | Pending |
-| VID-02 | — | Pending |
-| AUD-01 | — | Pending |
-| AUD-02 | — | Pending |
-| STT-01 | — | Pending |
-| STT-02 | — | Pending |
-| SPE-01 | — | Pending |
-| SPE-02 | — | Pending |
-| SPE-03 | — | Pending |
-| SPE-04 | — | Pending |
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
-| SCORE-01 | — | Pending |
-| SCORE-02 | — | Pending |
-| SCORE-03 | — | Pending |
-| FDBK-01 | — | Pending |
-| FDBK-02 | — | Pending |
-| FDBK-03 | — | Pending |
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| DASH-06 | — | Pending |
-| DASH-07 | — | Pending |
-| DASH-08 | — | Pending |
-| DB-01 | — | Pending |
-| DB-02 | — | Pending |
-| DB-03 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
+| VID-01 | Phase 2 | Pending |
+| VID-02 | Phase 2 | Pending |
+| AUD-01 | Phase 2 | Pending |
+| AUD-02 | Phase 2 | Pending |
+| STT-01 | Phase 2 | Pending |
+| STT-02 | Phase 2 | Pending |
+| SPE-01 | Phase 3 | Pending |
+| SPE-02 | Phase 3 | Pending |
+| SPE-03 | Phase 3 | Pending |
+| SPE-04 | Phase 3 | Pending |
+| VIS-01 | Phase 4 | Pending |
+| VIS-02 | Phase 4 | Pending |
+| VIS-03 | Phase 4 | Pending |
+| SCORE-01 | Phase 5 | Pending |
+| SCORE-02 | Phase 5 | Pending |
+| SCORE-03 | Phase 5 | Pending |
+| FDBK-01 | Phase 5 | Pending |
+| FDBK-02 | Phase 5 | Pending |
+| FDBK-03 | Phase 5 | Pending |
+| DASH-01 | Phase 5 | Pending |
+| DASH-02 | Phase 5 | Pending |
+| DASH-03 | Phase 5 | Pending |
+| DASH-04 | Phase 5 | Pending |
+| DASH-05 | Phase 5 | Pending |
+| DASH-06 | Phase 5 | Pending |
+| DASH-07 | Phase 5 | Pending |
+| DASH-08 | Phase 5 | Pending |
+| DB-01 | Phase 5 | Pending |
+| DB-02 | Phase 5 | Pending |
+| DB-03 | Phase 5 | Pending |
+| UI-01 | Phase 1 | Pending |
+| UI-02 | Phase 5 | Pending |
+| UI-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 33 total
-- Mapped to phases: 0
-- Unmapped: 33 ⚠️
+- Mapped to phases: 33 ✓
+- Unmapped: 0
 
 ---
 
