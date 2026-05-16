@@ -56,7 +56,11 @@ Plans:
   2. System identifies the most used filler word in the transcript
   3. System calculates speaking speed in words per minute (WPM) and classifies as slow (&lt;110), good (110-160), or fast (&gt;160)
   4. Speech analysis results are stored in typed Pydantic models ready for dashboard display
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 03-01-PLAN.md — Speech analysis engine: filler word detection + WPM calculation (TDD)
+- [ ] 03-02-PLAN.md — Integrate speech analysis into Upload pipeline + Dashboard display
 
 ### Phase 4: Visual Analysis — Eye Contact & Emotion
 **Goal**: System analyzes video frames for eye contact percentage and emotional expressions — the unique differentiator
@@ -89,7 +93,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Infrastructure | 2/2 | Complete | 2026-05-16 |
-| 2. Upload, Audio & Transcription | 0/2 | Planned | - |
-| 3. Speech & Text Analysis | 0/0 | Not started | - |
+| 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
+| 3. Speech & Text Analysis | 0/2 | Planned | - |
 | 4. Visual Analysis | 0/0 | Not started | - |
 | 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |
