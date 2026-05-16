@@ -13,6 +13,7 @@ from modules.transcription import transcribe_audio
 from utils.file_manager import save_upload, get_file_size_mb, allowed_file
 from database.init import insert_interview
 from modules.speech_analysis import analyze_speech
+from modules.visual_analysis import analyze_visual
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -214,6 +215,53 @@ def render_upload_page():
                         use_container_width=True,
                         hide_index=True,
                     )
+
+                # ── Visual Analysis (Step 5) ──
+                # Visual analysis is independent — it processes the video file directly,
+                # not the transcript. Can run after speech analysis.
+                st.markdown("---")
+                st.markdown("### 👁️ Visual Analysis")
+
+                try:
+                    progress_bar.progress(85, text="Analyzing eye contact and emotions...")
+                    st.write("🎯 Analyzing eye contact with MediaPipe Face Mesh...")
+
+                    eye_result, emotion_result = analyze_visual(video_path)
+
+                    # Store in session state
+                    st.session_state.last_eye_contact = eye_result
+                    st.session_state.last_emotion = emotion_result
+
+                    # Display eye contact results
+                    st.write(f"✅ Eye contact: {eye_result.contact_percentage:.0f}% "
+                              f"({eye_result.contact_frames}/{eye_result.total_frames} frames)")
+
+                    # Display emotion results
+                    st.write(f"✅ Emotions analyzed across {emotion_result.frames_analyzed} frames")
+                    st.write(f"   Dominant emotion: **{emotion_result.dominant_emotion}**")
+
+                    # Show emotion distribution as a small bar chart
+                    if emotion_result.emotion_distribution:
+                        import pandas as pd
+                        emotion_df = pd.DataFrame(
+                            list(emotion_result.emotion_distribution.items()),
+                            columns=["Emotion", "Frequency"]
+                        )
+                        st.dataframe(emotion_df, use_container_width=True, hide_index=True)
+
+                    progress_bar.progress(100, text="Pipeline complete!")
+                    status.update(label="Analysis complete", state="complete", expanded=False)
+
+                except Exception as e:
+                    # Visual analysis is non-critical — pipeline continues without it
+                    st.warning(f"⚠️ Visual analysis encountered an issue: {str(e)}")
+                    st.caption("Transcript and speech analysis are still available. "
+                              "Visual results will show as unavailable on the Dashboard.")
+                    # Set defaults so dashboard doesn't crash
+                    st.session_state.last_eye_contact = None
+                    st.session_state.last_emotion = None
+                    progress_bar.progress(100, text="Pipeline complete!")
+                    status.update(label="Analysis complete (visual unavailable)", state="complete", expanded=False)
 
                 st.success("✅ Analysis complete! Visit the **Dashboard** page to view detailed results.")
                 st.rerun()
