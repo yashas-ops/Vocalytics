@@ -10,7 +10,7 @@ A fully local AI-powered Streamlit app that analyzes mock interview videos. The 
 - [ ] **Phase 2: Video Upload, Audio Pipeline & Transcription** - Video upload, ffmpeg audio extraction, VAD preprocessing, faster-whisper transcription with timestamped segments
 - [x] **Phase 3: Speech & Text Analysis** - Filler word detection (spaCy POS-tagging), WPM calculation, speed classification (completed 2026-05-16)
 - [x] **Phase 4: Visual Analysis — Eye Contact & Emotion** - Keyframe extraction, MediaPipe eye contact with head pose estimation, DeepFace emotion analysis (completed 2026-05-16)
-- [ ] **Phase 5: Scoring, Feedback & Dashboard** - Confidence score, template-based feedback report, full dashboard with charts, SQLite persistence, history browser
+- [x] **Phase 5: Scoring, Feedback & Dashboard** - Confidence score, template-based feedback report, full dashboard with charts, SQLite persistence, history browser (completed 2026-05-16)
 
 ## Phase Details
 
@@ -93,7 +93,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — Scoring engine + feedback templates (TDD: compute_confidence, generate_feedback)
 - [x] 05-02-PLAN.md — Pipeline Step 6 integration + SQLite persistence + DB fetch functions
-- [ ] 05-03-PLAN.md — Dashboard finalization (Plotly charts, video, feedback) + History page
+- [x] 05-03-PLAN.md — Dashboard finalization (Plotly charts, video, feedback) + History page
 
 ## Progress
 
@@ -105,4 +105,4 @@ Plans:
 | 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
 | 3. Speech & Text Analysis | 2/2 | Complete   | 2026-05-16 |
 | 4. Visual Analysis | 2/2 | Complete   | 2026-05-16 |
-| 5. Scoring, Feedback & Dashboard | 0/3 | Not started | - |
+| 5. Scoring, Feedback & Dashboard | 3/3 | Complete   | 2026-05-16 |

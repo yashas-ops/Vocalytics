@@ -49,26 +49,26 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Dashboard
 
-- [ ] **DASH-01**: Dashboard displays uploaded video preview
-- [ ] **DASH-02**: Dashboard displays transcript panel
-- [ ] **DASH-03**: Dashboard displays confidence score card with classification
-- [ ] **DASH-04**: Dashboard displays speaking speed card with WPM and classification
-- [ ] **DASH-05**: Dashboard displays eye contact percentage chart
-- [ ] **DASH-06**: Dashboard displays emotion analytics chart
-- [ ] **DASH-07**: Dashboard displays filler word breakdown
-- [ ] **DASH-08**: Dashboard displays final AI feedback report
+- [x] **DASH-01**: Dashboard displays uploaded video preview
+- [x] **DASH-02**: Dashboard displays transcript panel
+- [x] **DASH-03**: Dashboard displays confidence score card with classification
+- [x] **DASH-04**: Dashboard displays speaking speed card with WPM and classification
+- [x] **DASH-05**: Dashboard displays eye contact percentage chart
+- [x] **DASH-06**: Dashboard displays emotion analytics chart
+- [x] **DASH-07**: Dashboard displays filler word breakdown
+- [x] **DASH-08**: Dashboard displays final AI feedback report
 
 ### Database & History
 
 - [x] **DB-01**: System stores interview results in local SQLite database
 - [x] **DB-02**: Stored fields include: interview_id, transcript, confidence_score, filler_count, speaking_speed, eye_contact_score, dominant_emotion, generated_feedback, timestamp
-- [ ] **DB-03**: User can view past interview results from history
+- [x] **DB-03**: User can view past interview results from history
 
 ### UI/UX
 
 - [ ] **UI-01**: Application uses dark theme with modern startup-style design
-- [ ] **UI-02**: Dashboard uses cards, progress bars, and charts for data visualization
-- [ ] **UI-03**: Charts rendered with Plotly or Streamlit native charts
+- [x] **UI-02**: Dashboard uses cards, progress bars, and charts for data visualization
+- [x] **UI-03**: Charts rendered with Plotly or Streamlit native charts
 
 ## v2 Requirements
 
@@ -135,20 +135,20 @@ Deferred to future release. Tracked but not in current roadmap.
 | FDBK-01 | Phase 5 | Complete |
 | FDBK-02 | Phase 5 | Complete |
 | FDBK-03 | Phase 5 | Complete |
-| DASH-01 | Phase 5 | Pending |
-| DASH-02 | Phase 5 | Pending |
-| DASH-03 | Phase 5 | Pending |
-| DASH-04 | Phase 5 | Pending |
-| DASH-05 | Phase 5 | Pending |
-| DASH-06 | Phase 5 | Pending |
-| DASH-07 | Phase 5 | Pending |
-| DASH-08 | Phase 5 | Pending |
+| DASH-01 | Phase 5 | Complete |
+| DASH-02 | Phase 5 | Complete |
+| DASH-03 | Phase 5 | Complete |
+| DASH-04 | Phase 5 | Complete |
+| DASH-05 | Phase 5 | Complete |
+| DASH-06 | Phase 5 | Complete |
+| DASH-07 | Phase 5 | Complete |
+| DASH-08 | Phase 5 | Complete |
 | DB-01 | Phase 5 | Complete |
 | DB-02 | Phase 5 | Complete |
-| DB-03 | Phase 5 | Pending |
+| DB-03 | Phase 5 | Complete |
 | UI-01 | Phase 1 | Pending |
-| UI-02 | Phase 5 | Pending |
-| UI-03 | Phase 5 | Pending |
+| UI-02 | Phase 5 | Complete |
+| UI-03 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 33 total

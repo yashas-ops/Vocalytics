@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 05-02-PLAN.md (scoring + persistence pipeline)
-last_updated: "2026-05-16T08:23:47.314Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 05-03-PLAN.md (Dashboard & History finalization)
+last_updated: "2026-05-16T08:28:44.976Z"
 last_activity: 2026-05-16
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 100
 ---
 
@@ -63,6 +63,7 @@ Progress: [████████████████████] 100%
 | Phase 04-visual-analysis-eye-contact-emotion P04-02 | 2min | 2 tasks | 1 files |
 | Phase 05-scoring-feedback-dashboard P01 | 4.8min | 2 tasks | 2 files |
 | Phase 05-scoring-feedback-dashboard P02 | 3min | 2 tasks | 2 files |
+| Phase 05-scoring-feedback-dashboard P05-03 | 2.9 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,9 @@ Progress: [████████████████████] 100%
 - [Phase 03-speech-text-analysis]: WPM classification color-coded: green (good), yellow (fast/slow)
 - [Phase 05-scoring-feedback-dashboard]: Weighted heuristic scoring: eye_contact 30%, filler 25%, pacing 20%, clarity 15%, emotion 10%
 - [Phase 05-scoring-feedback-dashboard]: update_interview uses **kwargs for dynamic SET clause — single function handles all column updates
+- [Phase 05-scoring-feedback-dashboard]: Dashboard top layout: video 40% left + 2x2 metric cards 60% right using st.columns([2,3])
+- [Phase 05-scoring-feedback-dashboard]: History click-to-view navigates directly to Dashboard (no separate detail view) — simpler UX per D-16 discretion
+- [Phase 05-scoring-feedback-dashboard]: load_interview_to_session() reconstructs all Pydantic models from DB row dicts — covers ConfidenceScores, SpeechAnalysisResult, EyeContactResult, EmotionResult, TranscriptionResult
 
 ### Phase 1 Deliverables
 
@@ -134,6 +138,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-16T08:23:47.309Z
-Stopped at: Completed 05-02-PLAN.md (scoring + persistence pipeline)
+Last session: 2026-05-16T08:28:30.444Z
+Stopped at: Completed 05-03-PLAN.md (Dashboard & History finalization)
 Next: Phase 5 — Scoring, Feedback & Dashboard
