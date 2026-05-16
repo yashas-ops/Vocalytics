@@ -60,8 +60,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Database & History
 
-- [ ] **DB-01**: System stores interview results in local SQLite database
-- [ ] **DB-02**: Stored fields include: interview_id, transcript, confidence_score, filler_count, speaking_speed, eye_contact_score, dominant_emotion, generated_feedback, timestamp
+- [x] **DB-01**: System stores interview results in local SQLite database
+- [x] **DB-02**: Stored fields include: interview_id, transcript, confidence_score, filler_count, speaking_speed, eye_contact_score, dominant_emotion, generated_feedback, timestamp
 - [ ] **DB-03**: User can view past interview results from history
 
 ### UI/UX
@@ -143,8 +143,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | DASH-06 | Phase 5 | Pending |
 | DASH-07 | Phase 5 | Pending |
 | DASH-08 | Phase 5 | Pending |
-| DB-01 | Phase 5 | Pending |
-| DB-02 | Phase 5 | Pending |
+| DB-01 | Phase 5 | Complete |
+| DB-02 | Phase 5 | Complete |
 | DB-03 | Phase 5 | Pending |
 | UI-01 | Phase 1 | Pending |
 | UI-02 | Phase 5 | Pending |
