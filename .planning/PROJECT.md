@@ -12,15 +12,15 @@ A user can record or upload a mock interview and immediately get actionable, dat
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] System initializes with dark-themed Streamlit shell, SQLite schema, and shared Pydantic models — Phase 1: Core Infrastructure
+- [x] System extracts audio from video using ffmpeg — Phase 2: Video Upload, Audio Pipeline & Transcription
+- [x] System converts speech to text using local Whisper (tiny/base model for CPU) — Phase 2: Video Upload, Audio Pipeline & Transcription
+- [x] User can upload video (mp4, mov, avi) and run the extract→transcribe pipeline — Phase 2: Video Upload, Audio Pipeline & Transcription
+- [x] System detects and counts filler words (um, uh, like, basically, literally, you know) with spaCy POS-disambiguation — Phase 3: Speech & Text Analysis
+- [x] System calculates speaking speed in WPM and classifies as slow/good/fast — Phase 3: Speech & Text Analysis
 
 ### Active
 
-- [ ] User can upload video (mp4, mov, avi) or record via webcam
-- [ ] System extracts audio from video using moviepy/ffmpeg
-- [ ] System converts speech to text using local Whisper (tiny/base model for CPU)
-- [ ] System detects and counts filler words (um, uh, like, basically, literally, you know)
-- [ ] System calculates speaking speed in WPM and classifies as slow/good/fast
 - [ ] System detects eye contact percentage using MediaPipe Face Mesh
 - [ ] System detects dominant emotion(s) using DeepFace or FER
 - [ ] System computes a confidence score (0-100) using weighted heuristic
@@ -66,12 +66,18 @@ A user can record or upload a mock interview and immediately get actionable, dat
 | CPU-optimized Whisper model (tiny/base) | No GPU assumed, must run on laptop | — Pending |
 | Keyframe-based emotion analysis | Full video emotion scan too slow on CPU | — Pending |
 | Template-based feedback (no LLM) | Avoids API costs, keeps it local | — Pending |
+| POS-disambiguated filler detection | spaCy token.pos_ != "VERB" and token.pos_ != "AUX" excludes verb uses of "like" | Implemented in Phase 3 |
+| WPM with INT8 faster-whisper | Faster-whisper duration_sec field used for WPM calculation | Implemented in Phase 3 |
 | Heuristic confidence score | Simple, explainable, no ML needed | — Pending |
 | SQLite over file-based storage | Structured queries, easy history tracking | — Pending |
 
 ---
 
-*Last updated: 2026-05-16 after initialization*
+*Last updated: 2026-05-16 — Phase 3 complete*
+
+## Current State
+
+Phase 3 (Speech & Text Analysis) complete — filler word detection with spaCy POS-disambiguation and WPM calculation integrated into the Upload pipeline and Dashboard. 6/6 plans completed across 3 phases. Next: Phase 4 — Visual Analysis (eye contact & emotion).
 
 ## Evolution
 
