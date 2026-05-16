@@ -599,3 +599,163 @@ class TestComputeConfidence:
 
         rate = calc_filler_rate(5, -1)
         assert rate == 0.0, f"Expected 0.0, got {rate}"
+
+
+# ============================================================
+# Feedback Tests: generate_feedback()
+# ============================================================
+
+class TestGenerateFeedback:
+    """Test suite for generate_feedback."""
+
+    def _get_feedback(self, eye_contact_pct, filler_rate_per_100, wpm,
+                      speed_classification, dominant_emotion,
+                      filler_count=None, eye_contact_score_override=None):
+        """Helper: compute confidence then generate feedback."""
+        from modules.scoring import compute_confidence, generate_feedback
+
+        confidence = compute_confidence(
+            eye_contact_pct=eye_contact_pct,
+            filler_rate_per_100=filler_rate_per_100,
+            wpm=wpm,
+            speed_classification=speed_classification,
+            dominant_emotion=dominant_emotion,
+        )
+
+        return generate_feedback(
+            confidence=confidence,
+            eye_contact_pct=eye_contact_pct,
+            filler_rate_per_100=filler_rate_per_100,
+            filler_count=filler_count if filler_count is not None else 0,
+            wpm=wpm,
+            speed_classification=speed_classification,
+            dominant_emotion=dominant_emotion,
+        )
+
+    def test_feedback_perfect(self):
+        """All metrics ideal -> full strengths, no weaknesses, few tips."""
+        feedback = self._get_feedback(
+            eye_contact_pct=100.0,
+            filler_rate_per_100=0.0,
+            wpm=135.0,
+            speed_classification="good",
+            dominant_emotion="happy",
+            filler_count=0,
+        )
+
+        # Should have strengths + overall (composite=100)
+        assert "Strong Eye Contact" in feedback
+        assert "Low Filler Usage" in feedback
+        assert "Well-Paced" in feedback
+        assert "Positive Demeanor" in feedback
+        assert "Excellent confidence score" in feedback
+
+        # Should NOT have weakness markers
+        assert "⚠️" not in feedback, \
+            "Perfect scores should have no weaknesses"
+
+    def test_feedback_all_poor(self):
+        """All metrics poor -> 1 encouraging strength, all weaknesses, all tips."""
+        feedback = self._get_feedback(
+            eye_contact_pct=0.0,
+            filler_rate_per_100=15.0,
+            wpm=240.0,
+            speed_classification="fast",
+            dominant_emotion="disgust",
+            filler_count=30,
+        )
+
+        # Should have encouraging message
+        assert "Keep practicing" in feedback, \
+            "Should have encouraging message when no strengths"
+
+        # Should have all weakness markers
+        assert "Eye Contact Needs Work" in feedback
+        assert "Frequent Filler Words" in feedback
+        assert "Speaking Pace is FAST" in feedback
+        assert "Speaking Clarity Affected" in feedback
+        assert "Facial Expressions Appear" in feedback
+
+        # Should have various tip markers
+        assert "Camera Practice" in feedback
+        assert "Pause Instead of Filler" in feedback
+        assert "Slow Down" in feedback
+        assert "Clarity Drill" in feedback
+        assert "Facial Engagement" in feedback
+
+        # Should have 3 sections
+        assert feedback.count("---") == 2, \
+            f"Expected 2 separators for 3 sections, got {feedback.count('---')}"
+
+    def test_feedback_mixed(self):
+        """Mixed scores -> partial strengths + partial weaknesses."""
+        feedback = self._get_feedback(
+            eye_contact_pct=75.0,
+            filler_rate_per_100=8.0,     # filler_score = 20 (< 60)
+            wpm=100.0,
+            speed_classification="slow",
+            dominant_emotion="sad",       # emotion_score = 40 (< 60)
+            filler_count=16,
+        )
+
+        # Should have some strengths (eye_contact=75 >= 70)
+        assert "Strong Eye Contact" in feedback
+
+        # Should have some weaknesses (filler=20 < 60, emotion=40 < 60)
+        assert "Frequent Filler Words" in feedback
+        assert "Facial Expressions Appear SAD" in feedback
+
+        # Should NOT have all weakness types
+        assert "Eye Contact Needs Work" not in feedback, \
+            "Eye contact 75% should not be a weakness"
+
+    def test_feedback_structure(self):
+        """Verify output contains proper section structure."""
+        feedback = self._get_feedback(
+            eye_contact_pct=80.0,
+            filler_rate_per_100=5.0,     # filler_score = 50 (< 60)
+            wpm=130.0,
+            speed_classification="good",
+            dominant_emotion="happy",
+            filler_count=10,
+        )
+
+        # Should have all three section headers
+        assert "## Strengths" in feedback, \
+            "Should have Strengths section"
+        assert "## Areas to Improve" in feedback, \
+            "Should have Areas to Improve section"
+        assert "## Improvement Tips" in feedback, \
+            "Should have Improvement Tips section"
+
+        # Sections separated by ---
+        assert "---" in feedback, \
+            "Should have section separators"
+
+        # Feedback should be non-empty string
+        assert len(feedback) > 50, \
+            "Feedback should be substantive"
+
+    def test_feedback_empty_strengths(self):
+        """All scores < 70 -> encouraging message, no individual strengths."""
+        feedback = self._get_feedback(
+            eye_contact_pct=40.0,
+            filler_rate_per_100=8.0,     # filler_score = 20
+            wpm=30.0,                    # pacing=0, clarity=0
+            speed_classification="slow",
+            dominant_emotion="disgust",   # emotion_score = 10
+            filler_count=20,
+        )
+
+        # Should have "keep practicing" message
+        assert "Keep practicing" in feedback, \
+            "Should show encouraging message when no strengths"
+
+        # Should NOT have individual strength markers
+        assert "Strong Eye Contact" not in feedback
+        assert "Low Filler Usage" not in feedback
+        assert "Well-Paced" not in feedback
+        assert "Positive Demeanor" not in feedback
+
+        # Should still have weaknesses (all < 60)
+        assert "Eye Contact Needs Work" in feedback

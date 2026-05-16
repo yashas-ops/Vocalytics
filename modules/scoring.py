@@ -179,3 +179,157 @@ def compute_confidence(
         composite=composite,
         classification=classification,
     )
+
+
+# ---------------------------------------------------------------------------
+# Feedback generation
+# ---------------------------------------------------------------------------
+
+
+def generate_feedback(
+    confidence: ConfidenceScores,
+    eye_contact_pct: float,
+    filler_rate_per_100: float,
+    filler_count: int,
+    wpm: float,
+    speed_classification: str,
+    dominant_emotion: str,
+) -> str:
+    """Generate deterministic template-based feedback report.
+
+    Produces a three-section report: Strengths, Weaknesses, Improvement Tips.
+    Each section uses threshold-driven templates — no ML models or LLM calls.
+
+    Args:
+        confidence: Computed ConfidenceScores with component breakdown.
+        eye_contact_pct: Percentage of frames with eye contact (0-100).
+        filler_rate_per_100: Filler word rate per 100 words.
+        filler_count: Total number of filler words detected.
+        wpm: Words per minute speaking speed.
+        speed_classification: One of "slow", "good", or "fast".
+        dominant_emotion: Detected dominant emotion label.
+
+    Returns:
+        Formatted string with three sections separated by \n\n---\n\n.
+    """
+    strengths: list[str] = []
+    weaknesses: list[str] = []
+    tips: list[str] = []
+
+    # --- Strengths (component_score >= 70) ---
+    if confidence.eye_contact_score >= 70:
+        strengths.append(
+            f"✅ Strong Eye Contact — You maintained eye contact "
+            f"{eye_contact_pct}% of the time."
+        )
+    if confidence.filler_score >= 70:
+        strengths.append(
+            f"✅ Low Filler Usage — Only {filler_count} filler words "
+            f"({filler_rate_per_100:.1f}/100 words). "
+            f"Your speech is clear and direct."
+        )
+    if confidence.pacing_score >= 70 or confidence.clarity_score >= 70:
+        strengths.append(
+            f"✅ Well-Paced — {wpm} WPM is within the ideal 110-160 range. "
+            f"Good speaking rhythm."
+        )
+    if confidence.emotion_score >= 70:
+        strengths.append(
+            f"✅ Positive Demeanor — Predominantly {dominant_emotion}, "
+            f"which conveys confidence and engagement."
+        )
+
+    # Overall excellent summary
+    if confidence.composite >= 80:
+        strengths.append(
+            f"✅ Overall: Excellent confidence score of {confidence.composite}. "
+            f"Strong performance across all metrics."
+        )
+
+    if not strengths:
+        strengths.append(
+            "Keep practicing — every metric has room for improvement."
+        )
+
+    # --- Weaknesses (component_score < 60) ---
+    if confidence.eye_contact_score < 60:
+        weaknesses.append(
+            f"⚠️ Eye Contact Needs Work — Only {eye_contact_pct}% eye contact. "
+            f"Try looking directly at the camera lens."
+        )
+    if confidence.filler_score < 60:
+        weaknesses.append(
+            f"⚠️ Frequent Filler Words — {filler_rate_per_100:.1f} per 100 words "
+            f"({filler_count} total). Reducing fillers will make you sound "
+            f"more polished."
+        )
+    if confidence.pacing_score < 60:
+        weaknesses.append(
+            f"⚠️ Speaking Pace is {speed_classification.upper()} — {wpm} WPM. "
+            f"Target the 110-160 range for best clarity."
+        )
+    if confidence.clarity_score < 60:
+        weaknesses.append(
+            f"⚠️ Speaking Clarity Affected by Pace — {wpm} WPM is outside "
+            f"the ideal range. Practice modulating your speed."
+        )
+    if confidence.emotion_score < 60:
+        weaknesses.append(
+            f"⚠️ Facial Expressions Appear {dominant_emotion.upper()} — "
+            f"Try to project more confidence through your expressions."
+        )
+
+    # --- Improvement Tips ---
+    if confidence.eye_contact_score < 70:
+        tips.append(
+            "- **Camera Practice**: Place a sticky note next to your camera "
+            "lens. Every time you speak, glance at it as a reminder to make "
+            "'eye contact' with the camera."
+        )
+    if confidence.filler_score < 70:
+        tips.append(
+            "- **Pause Instead of Filler**: When you feel 'um' or 'uh' coming, "
+            "pause silently instead. Record yourself and count filler words — "
+            "awareness reduces them by 30-50% with practice."
+        )
+    if confidence.pacing_score < 70 and speed_classification == "fast":
+        tips.append(
+            "- **Slow Down**: Practice pausing between key points. Try the "
+            "'one breath per sentence' technique to naturally regulate your pace."
+        )
+    if confidence.pacing_score < 70 and speed_classification == "slow":
+        tips.append(
+            "- **Pick Up the Pace**: Practice with a timer — aim to cover key "
+            "points within 2-minute blocks. Read passages aloud to build fluency."
+        )
+    if confidence.clarity_score < 80:
+        tips.append(
+            "- **Clarity Drill**: Record yourself reading a short passage at "
+            "120-150 WPM. Replay and check if every word is clear. Adjust "
+            "until your natural pace lands in this range."
+        )
+    if confidence.emotion_score < 60:
+        tips.append(
+            "- **Facial Engagement**: Practice speaking with slight smile "
+            "(for neutral/positive topics). Record yourself and check if your "
+            "expression matches your message."
+        )
+
+    # Build report sections
+    sections: list[str] = []
+
+    # Strengths section
+    strengths_section = "## Strengths\n\n" + "\n".join(strengths)
+    sections.append(strengths_section)
+
+    # Weaknesses section (only if there are weaknesses)
+    if weaknesses:
+        weaknesses_section = "## Areas to Improve\n\n" + "\n".join(weaknesses)
+        sections.append(weaknesses_section)
+
+    # Tips section (only if there are tips)
+    if tips:
+        tips_section = "## Improvement Tips\n\n" + "\n".join(tips)
+        sections.append(tips_section)
+
+    return "\n\n---\n\n".join(sections)
