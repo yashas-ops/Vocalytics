@@ -87,8 +87,13 @@ Plans:
   3. System generates template-based feedback report listing strengths, weaknesses, and specific improvement tips — no LLM/API calls
   4. Dashboard displays all results: video preview, transcript panel, confidence score card, speaking speed card, eye contact percentage chart, emotion analytics chart, filler word breakdown, and feedback report
   5. All analysis results persist to SQLite; user can view past interview history from the History page, including any previous session's full report
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 05-01-PLAN.md — Scoring engine + feedback templates (TDD: compute_confidence, generate_feedback)
+- [ ] 05-02-PLAN.md — Pipeline Step 6 integration + SQLite persistence + DB fetch functions
+- [ ] 05-03-PLAN.md — Dashboard finalization (Plotly charts, video, feedback) + History page
 
 ## Progress
 
@@ -100,4 +105,4 @@ Plans:
 | 2. Upload, Audio & Transcription | 2/2 | Complete | 2026-05-16 |
 | 3. Speech & Text Analysis | 2/2 | Complete   | 2026-05-16 |
 | 4. Visual Analysis | 2/2 | Complete   | 2026-05-16 |
-| 5. Scoring, Feedback & Dashboard | 0/0 | Not started | - |
+| 5. Scoring, Feedback & Dashboard | 0/3 | Not started | - |
