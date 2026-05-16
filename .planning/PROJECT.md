@@ -21,11 +21,11 @@ A user can record or upload a mock interview and immediately get actionable, dat
 - [x] System detects eye contact percentage using MediaPipe Face Mesh with PnP head pose estimation (yaw ±15°, pitch ±10°) — Phase 4: Visual Analysis
 - [x] System detects dominant emotion(s) using DeepFace on keyframe-sampled video frames (max 20 frames) — Phase 4: Visual Analysis
 
-### Active
-- [ ] System computes a confidence score (0-100) using weighted heuristic
-- [ ] System generates template-based feedback report (strengths, weaknesses, tips)
-- [ ] Dashboard displays: video preview, transcript, confidence score, speed, eye contact chart, emotion analytics, filler breakdown, feedback report
-- [ ] All analysis data stored in local SQLite database with interview history
+### Validated
+- [x] System computes a confidence score (0-100) using weighted heuristic — Phase 5
+- [x] System generates template-based feedback report (strengths, weaknesses, tips) — Phase 5
+- [x] Dashboard displays: video preview, transcript, confidence score, speed, eye contact chart, emotion analytics, filler breakdown, feedback report — Phase 5
+- [x] All analysis data stored in local SQLite database with interview history — Phase 5
 
 ### Out of Scope
 
@@ -64,21 +64,21 @@ A user can record or upload a mock interview and immediately get actionable, dat
 |----------|-----------|---------|
 | CPU-optimized Whisper model (tiny/base) | No GPU assumed, must run on laptop | — Pending |
 | Keyframe-based emotion analysis | Full video emotion scan too slow on CPU | — Pending |
-| Template-based feedback (no LLM) | Avoids API costs, keeps it local | — Pending |
+| Template-based feedback (no LLM) | Avoids API costs, keeps it local | Implemented in Phase 5 |
 | POS-disambiguated filler detection | spaCy token.pos_ != "VERB" and token.pos_ != "AUX" excludes verb uses of "like" | Implemented in Phase 3 |
 | WPM with INT8 faster-whisper | Faster-whisper duration_sec field used for WPM calculation | Implemented in Phase 3 |
 | PnP head pose eye contact | MediaPipe landmarks + cv2.solvePnP, yaw ±15° / pitch ±10° thresholds (not face-detect boolean) | Implemented in Phase 4 |
 | DeepFace keyframe emotion | Max 20 frames, opencv backend, 50% confidence threshold, soft voting across frames | Implemented in Phase 4 |
-| Heuristic confidence score | Simple, explainable, no ML needed | — Pending |
-| SQLite over file-based storage | Structured queries, easy history tracking | — Pending |
+| Heuristic confidence score | Simple, explainable, no ML needed | Implemented in Phase 5 |
+| SQLite over file-based storage | Structured queries, easy history tracking | Implemented in Phase 5 |
 
 ---
 
-*Last updated: 2026-05-16 — Phase 4 complete*
+*Last updated: 2026-05-16 — Phase 5 complete (MVP done)*
 
 ## Current State
 
-Phase 4 (Visual Analysis) complete — keyframe extraction (OpenCV), PnP head pose eye contact (MediaPipe), and emotion frequency distribution (DeepFace soft voting) integrated as Step 5 in the Upload pipeline with Dashboard display. 8/8 plans completed across 4 phases. Next: Phase 5 — Scoring, Feedback & Dashboard (final phase).
+**All 5 phases complete.** The application analyzes mock interview videos end-to-end: upload → audio extraction → transcription → speech analysis (fillers + WPM) → visual analysis (eye contact + emotion) → confidence scoring → feedback report → SQLite persistence. Full dark-themed dashboard with video preview, Plotly charts, and interview history browser. 11/11 plans completed across 5 phases. MVP complete.
 
 ## Evolution
 
