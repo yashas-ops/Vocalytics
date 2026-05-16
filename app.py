@@ -17,6 +17,13 @@ from modules.visual_analysis import analyze_visual
 from modules.scoring import compute_confidence, generate_feedback, calc_filler_rate
 from database.init import update_interview
 import json
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+import plotly.io as pio
+
+# Set dark theme for Plotly charts (per D-12)
+pio.templates.default = "plotly_dark"
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -102,6 +109,7 @@ def render_upload_page():
                         progress_bar.progress(10, text="Saving video...")
                         st.write("📁 Saving video to uploads/...")
                         video_path = save_upload(uploaded_file)
+                        st.session_state.last_video_path = video_path
                         interview_id = insert_interview(video_path)
                         st.write(f"✅ Video saved ({get_file_size_mb(video_path):.1f} MB)")
                         st.write(f"📋 Interview ID: `{interview_id}`")
@@ -245,7 +253,6 @@ def render_upload_page():
 
                     # Show emotion distribution as a small bar chart
                     if emotion_result.emotion_distribution:
-                        import pandas as pd
                         emotion_df = pd.DataFrame(
                             list(emotion_result.emotion_distribution.items()),
                             columns=["Emotion", "Frequency"]
@@ -404,26 +411,66 @@ def render_dashboard_page():
 
     # ── Analysis results available ──
 
-    # Metric cards with real data
-    col1, col2, col3, col4 = st.columns(4)
+    # Top row: Video preview + Metric cards (per D-09)
+    col_video, col_metrics = st.columns([2, 3])  # 40% video, 60% metrics
 
-    with col1:
-        st.metric("Confidence Score", "—", help="Coming in Phase 5")
-    with col2:
-        eye_contact = st.session_state.get("last_eye_contact")
-        if eye_contact is not None:
-            contact_pct = f"{eye_contact.contact_percentage:.0f}%"
-            st.metric("Eye Contact", contact_pct,
-                      help=f"Based on {eye_contact.total_frames} sampled frames")
+    with col_video:
+        video_path = st.session_state.get("last_video_path")
+        if video_path:
+            st.video(video_path)
         else:
-            st.metric("Eye Contact", "—", help="Not available — run a video with visible face")
-    with col3:
-        wpm = f"{speech.wpm:.0f}"
-        st.metric("Speaking Speed", f"{wpm} WPM",
-                  help=f"Classification: {speech.speed_classification}")
-    with col4:
-        st.metric("Filler Words", str(speech.total_filler_count),
-                  help=f"Out of {speech.total_words} total words")
+            st.info("Video preview not available")
+
+    with col_metrics:
+        # 2x2 grid of metric cards
+        col_a, col_b = st.columns(2)
+        col_c, col_d = st.columns(2)
+
+        with col_a:
+            confidence = st.session_state.get("last_confidence")
+            if confidence is not None:
+                score = confidence.composite
+                cls = confidence.classification
+                st.metric("Confidence Score", f"{score:.0f}/100",
+                          help=f"Classification: {cls}")
+            else:
+                st.metric("Confidence Score", "—")
+
+        with col_b:
+            eye_contact = st.session_state.get("last_eye_contact")
+            if eye_contact is not None:
+                contact_pct = f"{eye_contact.contact_percentage:.0f}%"
+                st.metric("Eye Contact", contact_pct,
+                          help=f"Based on {eye_contact.total_frames} sampled frames")
+            else:
+                st.metric("Eye Contact", "—", help="Not available")
+
+        with col_c:
+            speech = st.session_state.get("last_speech_analysis")
+            if speech is not None:
+                wpm = f"{speech.wpm:.0f}"
+                st.metric("Speaking Speed", f"{wpm} WPM",
+                          help=f"Classification: {speech.speed_classification}")
+            else:
+                st.metric("Speaking Speed", "—")
+
+        with col_d:
+            if speech is not None:
+                st.metric("Filler Words", str(speech.total_filler_count),
+                          help=f"Out of {speech.total_words} total words")
+            else:
+                st.metric("Filler Words", "—")
+
+    # Confidence color indicator (below metric cards)
+    if confidence is not None:
+        score = confidence.composite
+        cls = confidence.classification
+        if cls == "Excellent":
+            st.success(f"✅ **{cls}** — Confidence score of **{score:.0f}/100**. Strong performance!")
+        elif cls == "Good":
+            st.warning(f"📊 **{cls}** — Confidence score of **{score:.0f}/100**. Solid foundation with room to grow.")
+        else:
+            st.error(f"📉 **{cls}** — Confidence score of **{score:.0f}/100**. Focus on the improvement areas below.")
 
     # Speed classification colored indicator
     speed = speech.speed_classification
@@ -514,39 +561,273 @@ def render_dashboard_page():
             if emotion is not None and emotion.frames_analyzed > 0:
                 st.metric("Dominant Emotion", emotion.dominant_emotion.capitalize())
 
-                # Emotion frequency distribution per D-20
+                # Emotion frequency distribution — Plotly horizontal bar chart (per D-11, D-12)
                 if emotion.emotion_distribution:
-                    st.markdown("**Emotion Frequency:**")
-                    import pandas as pd
+                    st.markdown("**Emotion Distribution:**")
                     emotion_df = pd.DataFrame(
                         list(emotion.emotion_distribution.items()),
                         columns=["Emotion", "Frequency"]
                     )
-                    st.dataframe(emotion_df, use_container_width=True, hide_index=True)
+                    # Sort by frequency descending for the bar chart
+                    emotion_df = emotion_df.sort_values("Frequency", ascending=True)
+
+                    fig_emotion = px.bar(
+                        emotion_df,
+                        x="Frequency",
+                        y="Emotion",
+                        orientation='h',
+                        title=None,
+                        text_auto='.0%',
+                        color="Frequency",
+                        color_continuous_scale="blues",
+                        height=250,
+                    )
+                    fig_emotion.update_layout(
+                        margin=dict(l=10, r=10, t=10, b=10),
+                        xaxis_title=None,
+                        yaxis_title=None,
+                        showlegend=False,
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        plot_bgcolor="rgba(0,0,0,0)",
+                    )
+                    st.plotly_chart(fig_emotion, use_container_width=True)
                     st.caption(f"Analyzed across {emotion.frames_analyzed} keyframes")
             else:
                 st.metric("Dominant Emotion", "—")
                 st.info("Emotion analysis not available")
 
-    # Placeholder for future phase results
+    # ── Confidence Score Gauge ──
+    if confidence is not None:
+        st.markdown("---")
+        st.markdown("### 📊 Confidence Score Breakdown")
+
+        # Gauge chart for composite score
+        fig_gauge = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=confidence.composite,
+            title={'text': f"Overall — {confidence.classification}"},
+            domain={'x': [0, 1], 'y': [0, 1]},
+            gauge={
+                'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#cccccc"},
+                'bar': {'color': "#636efa", 'thickness': 0.3},
+                'bgcolor': "rgba(0,0,0,0)",
+                'borderwidth': 0,
+                'steps': [
+                    {'range': [0, 60], 'color': '#5a1a1a'},     # Dark red
+                    {'range': [60, 80], 'color': '#5a4a1a'},     # Dark yellow
+                    {'range': [80, 100], 'color': '#1a4a1a'},    # Dark green
+                ],
+                'threshold': {
+                    'line': {'color': "white", 'width': 4},
+                    'thickness': 0.75,
+                    'value': confidence.composite,
+                },
+            },
+        ))
+        fig_gauge.update_layout(
+            height=250,
+            margin=dict(l=30, r=30, t=50, b=30),
+            paper_bgcolor="rgba(0,0,0,0)",
+            font={'color': "#cccccc", 'size': 14},
+        )
+
+        # Component breakdown (5 side-by-side metrics)
+        col_s1, col_s2, col_s3, col_s4, col_s5 = st.columns(5)
+        components = [
+            ("Eye Contact", confidence.eye_contact_score),
+            ("Filler Words", confidence.filler_score),
+            ("Pacing", confidence.pacing_score),
+            ("Clarity", confidence.clarity_score),
+            ("Emotion", confidence.emotion_score),
+        ]
+        for col, (label, score) in zip([col_s1, col_s2, col_s3, col_s4, col_s5], components):
+            col.metric(label, f"{score:.0f}")
+
+        st.plotly_chart(fig_gauge, use_container_width=True)
+
+    # ── Feedback Report ──
     st.markdown("---")
-    st.markdown("### Analysis Report")
-    st.info("💡 Full feedback report with confidence scoring will be available in Phase 5.")
+    st.markdown("### 📋 Feedback Report")
+
+    feedback = st.session_state.get("last_feedback")
+    if feedback:
+        with st.expander("View Detailed Feedback Report", expanded=False):
+            st.markdown(feedback)
+    else:
+        st.info("💡 Feedback report will be generated after running an analysis.")
 
 
 def render_history_page():
-    """History page — shows past interview sessions."""
+    """History page — shows past interview sessions with click-to-view."""
     st.title("History")
     st.markdown("Browse your past interview sessions.")
-
     st.markdown("---")
 
-    st.info("📋 Past interview history will appear here after your first analysis. "
-            "Results are stored locally in the database.")
+    # Fetch all interviews from database
+    from database.init import fetch_all_interviews
+    interviews = fetch_all_interviews()
 
-    # Placeholder for future history table
-    st.markdown("### Recent Sessions")
-    st.caption("No sessions yet. Upload your first interview to get started.")
+    if not interviews:
+        st.info("📋 No interview sessions yet. Upload your first interview to get started.")
+        st.markdown("### Recent Sessions")
+        st.caption("No sessions yet. Upload your first interview to get started.")
+        return
+
+    # Summary table (per D-15)
+    st.markdown(f"**{len(interviews)} session(s)**")
+
+    # Build table data
+    table_data = []
+    for row in interviews:
+        table_data.append({
+            "Date": row.get("created_at", "")[:10] if row.get("created_at") else "—",
+            "Score": f"{row.get('confidence_composite', 0):.0f}/100" if row.get("confidence_composite") else "—",
+            "Class": row.get("confidence_classification", "—"),
+            "WPM": f"{row.get('wpm', 0):.0f}" if row.get("wpm") else "—",
+            "Fillers": str(row.get("total_filler_count", "—")),
+            "Eye Contact": f"{row.get('eye_contact_percentage', 0):.0f}%" if row.get("eye_contact_percentage") else "—",
+            "Emotion": row.get("dominant_emotion", "—").capitalize() if row.get("dominant_emotion") else "—",
+            "ID": row.get("id", ""),
+        })
+
+    df = pd.DataFrame(table_data)
+
+    # Display table without ID column
+    display_cols = ["Date", "Score", "Class", "WPM", "Fillers", "Eye Contact", "Emotion"]
+    st.dataframe(
+        df[display_cols],
+        use_container_width=True,
+        hide_index=True,
+    )
+
+    # Click-to-view per D-16: select interview from dropdown
+    st.markdown("### View Full Report")
+    interview_options = {
+        f"{row['Date']} — Score: {row['Score']} — {row['Emotion']}": row["ID"]
+        for row in table_data
+    }
+
+    selected_label = st.selectbox(
+        "Select an interview to view:",
+        options=list(interview_options.keys()),
+        index=None,
+        placeholder="Choose an interview...",
+    )
+
+    if selected_label and st.button("📊 View Report", type="primary", use_container_width=True):
+        selected_id = interview_options[selected_label]
+        load_interview_to_session(selected_id)
+        st.session_state.page = "Dashboard"
+        st.rerun()
+
+
+def load_interview_to_session(interview_id: str):
+    """Load a past interview's data into session state and navigate to Dashboard.
+
+    Fetches the full record from SQLite and reconstructs session state
+    so the Dashboard can display it using its existing rendering logic.
+    """
+    from database.init import fetch_interview
+    from modules.models import (
+        ConfidenceScores, SpeechAnalysisResult, FillerWordCount,
+        EyeContactResult, EmotionResult, TranscriptionResult, TranscriptionSegment,
+    )
+    import json
+
+    row = fetch_interview(interview_id)
+    if row is None:
+        st.error("Interview not found.")
+        return
+
+    # Reconstruct ConfidenceScores
+    confidence = ConfidenceScores(
+        eye_contact_score=row.get("confidence_eye_contact", 0.0),
+        filler_score=row.get("confidence_filler", 0.0),
+        pacing_score=row.get("confidence_pacing", 0.0),
+        emotion_score=row.get("confidence_emotion", 0.0),
+        clarity_score=row.get("confidence_clarity", 0.0),
+        composite=row.get("confidence_composite", 0.0),
+        classification=row.get("confidence_classification", "Needs Improvement"),
+    )
+
+    # Reconstruct SpeechAnalysisResult
+    filler_words_json = row.get("filler_words_json")
+    filler_words = []
+    if filler_words_json:
+        try:
+            fw_list = json.loads(filler_words_json)
+            filler_words = [FillerWordCount(**fw) for fw in fw_list]
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    total_filler_count = row.get("total_filler_count", 0) or 0
+    wpm = row.get("wpm", 0.0) or 0.0
+    total_words = row.get("total_words", 0) or 0
+    speed_classification = row.get("speed_classification", "slow")
+    duration_sec = row.get("duration_sec", 0.0) or 0.0
+
+    speech_analysis = SpeechAnalysisResult(
+        filler_words=filler_words,
+        total_filler_count=total_filler_count,
+        top_filler=row.get("top_filler"),
+        wpm=wpm,
+        speed_classification=speed_classification,
+        total_words=total_words,
+        duration_minutes=duration_sec / 60.0 if duration_sec else 0.0,
+    )
+
+    # Reconstruct EyeContactResult
+    eye_contact_pct = row.get("eye_contact_percentage", 0.0) or 0.0
+    eye_contact_frames = row.get("eye_contact_frames", 0) or 0
+    eye_result = EyeContactResult(
+        contact_percentage=eye_contact_pct,
+        total_frames=eye_contact_frames,
+        contact_frames=int(eye_contact_pct * eye_contact_frames / 100.0) if eye_contact_frames > 0 else 0,
+        frame_results=[],
+    )
+
+    # Reconstruct EmotionResult
+    emotion_json = row.get("emotion_distribution_json")
+    emotion_distribution = {}
+    if emotion_json:
+        try:
+            emotion_distribution = json.loads(emotion_json)
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    emotion_result = EmotionResult(
+        dominant_emotion=row.get("dominant_emotion", "uncertain") or "uncertain",
+        emotion_distribution=emotion_distribution,
+        frames_analyzed=len(emotion_distribution) if emotion_distribution else 0,
+    )
+
+    # Reconstruct TranscriptionResult
+    transcript_text = row.get("transcript_text", "") or ""
+    transcript_json_str = row.get("transcript_json")
+    segments = []
+    if transcript_json_str:
+        try:
+            seg_list = json.loads(transcript_json_str)
+            segments = [TranscriptionSegment(**seg) for seg in seg_list]
+        except (json.JSONDecodeError, TypeError):
+            pass
+
+    transcript = TranscriptionResult(
+        segments=segments,
+        full_text=transcript_text,
+        model_used="history",
+        duration_sec=duration_sec,
+    )
+
+    # Populate session state
+    st.session_state.last_confidence = confidence
+    st.session_state.last_feedback = row.get("feedback_text", "")
+    st.session_state.last_speech_analysis = speech_analysis
+    st.session_state.last_transcript = transcript
+    st.session_state.last_eye_contact = eye_result
+    st.session_state.last_emotion = emotion_result
+    st.session_state.last_interview_id = interview_id
+    st.session_state.last_video_path = row.get("video_path", "")
 
 
 # Route to the correct page
