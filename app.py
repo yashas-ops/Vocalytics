@@ -236,29 +236,105 @@ def render_dashboard_page():
 
     st.markdown("---")
 
-    # Placeholder metrics cards
+    # Check if analysis data exists
+    speech = st.session_state.get("last_speech_analysis")
+    transcript = st.session_state.get("last_transcript")
+
+    if speech is None:
+        # Placeholder state — no analysis run yet
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Confidence Score", "—", help="Overall confidence score (0-100)")
+        with col2:
+            st.metric("Eye Contact", "—", help="Percentage of time looking at camera")
+        with col3:
+            st.metric("Speaking Speed", "—", help="Words per minute")
+        with col4:
+            st.metric("Filler Words", "—", help="Total filler word count")
+
+        st.info("📊 Analysis results will appear here after running an interview. "
+                "Return to the Upload page to submit a video.")
+        st.markdown("### Transcript")
+        st.text_area("Transcript", "", height=150,
+                     placeholder="Transcribed text will appear here...",
+                     disabled=True)
+        st.markdown("### Analysis Report")
+        st.info("💡 Feedback report will be generated after analysis.")
+        return
+
+    # ── Analysis results available ──
+
+    # Metric cards with real data
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("Confidence Score", "—", help="Overall confidence score (0-100)")
+        st.metric("Confidence Score", "—", help="Coming in Phase 5")
     with col2:
-        st.metric("Eye Contact", "—", help="Percentage of time looking at camera")
+        st.metric("Eye Contact", "—", help="Coming in Phase 4")
     with col3:
-        st.metric("Speaking Speed", "—", help="Words per minute")
+        wpm = f"{speech.wpm:.0f}"
+        st.metric("Speaking Speed", f"{wpm} WPM",
+                  help=f"Classification: {speech.speed_classification}")
     with col4:
-        st.metric("Filler Words", "—", help="Total filler word count")
+        st.metric("Filler Words", str(speech.total_filler_count),
+                  help=f"Out of {speech.total_words} total words")
 
-    st.info("📊 Analysis results will appear here after running an interview. "
-            "Return to the Upload page to submit a video.")
+    # Speed classification colored indicator
+    speed = speech.speed_classification
+    if speed == "fast":
+        st.warning(f"⚡ Speaking speed: **{wpm} WPM ({speed})**. Aim for 110–160 WPM.")
+    elif speed == "slow":
+        st.warning(f"🐢 Speaking speed: **{wpm} WPM ({speed})**. Try to pace up to 110–160 WPM.")
+    else:
+        st.success(f"✅ Speaking speed: **{wpm} WPM ({speed})**. Great pacing!")
 
-    # Placeholder area for future charts
-    st.markdown("### Transcript")
-    st.text_area("Transcript", "", height=150,
-                 placeholder="Transcribed text will appear here...",
-                 disabled=True)
+    # Transcript section
+    st.markdown("---")
+    st.markdown("### 📝 Transcript")
+    if transcript:
+        st.text_area("Full Transcript", transcript.full_text, height=200, disabled=True)
+    else:
+        st.info("Transcript not available.")
 
+    # Filler word breakdown section
+    st.markdown("### 🗣️ Filler Word Analysis")
+
+    if speech.filler_words:
+        col_a, col_b = st.columns([3, 2])
+        with col_a:
+            st.markdown(f"**Total filler words:** {speech.total_filler_count}")
+            st.markdown(f"**Most used:** `{speech.top_filler or '—'}`")
+            st.markdown(f"**Speaking duration:** {speech.duration_minutes:.1f} minutes")
+            st.markdown(f"**Total words spoken:** {speech.total_words}")
+
+        with col_b:
+            # Prepare filler breakdown for display
+            filler_data = {
+                fw.word: fw.count
+                for fw in sorted(
+                    speech.filler_words,
+                    key=lambda x: x.count,
+                    reverse=True
+                )
+            }
+            st.dataframe(
+                {"Word": list(filler_data.keys()), "Count": list(filler_data.values())},
+                use_container_width=True,
+                hide_index=True,
+            )
+
+        # Filler rate per 100 words
+        if speech.total_words > 0:
+            rate = (speech.total_filler_count / speech.total_words) * 100
+            st.caption(f"Filler rate: **{rate:.1f}** per 100 words "
+                       f"(~1 every {speech.total_words // max(speech.total_filler_count, 1)} words)")
+    else:
+        st.success("🎯 No filler words detected! Clean speech.")
+
+    # Placeholder for future phase results
+    st.markdown("---")
     st.markdown("### Analysis Report")
-    st.info("💡 Feedback report will be generated after analysis.")
+    st.info("💡 Full feedback report with confidence scoring will be available in Phase 5.")
 
 
 def render_history_page():
