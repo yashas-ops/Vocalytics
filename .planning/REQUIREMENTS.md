@@ -37,15 +37,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Confidence Scoring
 
-- [ ] **SCORE-01**: System computes confidence score (0-100) using weighted heuristic formula
-- [ ] **SCORE-02**: System classifies score as Excellent, Good, or Needs Improvement
-- [ ] **SCORE-03**: Heuristic considers eye contact, filler word frequency, and speaking pace
+- [x] **SCORE-01**: System computes confidence score (0-100) using weighted heuristic formula
+- [x] **SCORE-02**: System classifies score as Excellent, Good, or Needs Improvement
+- [x] **SCORE-03**: Heuristic considers eye contact, filler word frequency, and speaking pace
 
 ### Feedback Report
 
-- [ ] **FDBK-01**: System generates detailed template-based feedback report
-- [ ] **FDBK-02**: Report includes strengths, weaknesses, and specific improvement tips
-- [ ] **FDBK-03**: Report generation uses template-based NLP (spaCy), no LLM/API calls
+- [x] **FDBK-01**: System generates detailed template-based feedback report
+- [x] **FDBK-02**: Report includes strengths, weaknesses, and specific improvement tips
+- [x] **FDBK-03**: Report generation uses template-based NLP (spaCy), no LLM/API calls
 
 ### Dashboard
 
@@ -129,12 +129,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | VIS-01 | Phase 4 | Complete |
 | VIS-02 | Phase 4 | Complete |
 | VIS-03 | Phase 4 | Complete |
-| SCORE-01 | Phase 5 | Pending |
-| SCORE-02 | Phase 5 | Pending |
-| SCORE-03 | Phase 5 | Pending |
-| FDBK-01 | Phase 5 | Pending |
-| FDBK-02 | Phase 5 | Pending |
-| FDBK-03 | Phase 5 | Pending |
+| SCORE-01 | Phase 5 | Complete |
+| SCORE-02 | Phase 5 | Complete |
+| SCORE-03 | Phase 5 | Complete |
+| FDBK-01 | Phase 5 | Complete |
+| FDBK-02 | Phase 5 | Complete |
+| FDBK-03 | Phase 5 | Complete |
 | DASH-01 | Phase 5 | Pending |
 | DASH-02 | Phase 5 | Pending |
 | DASH-03 | Phase 5 | Pending |

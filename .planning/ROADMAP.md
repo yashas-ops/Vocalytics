@@ -91,7 +91,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01-PLAN.md — Scoring engine + feedback templates (TDD: compute_confidence, generate_feedback)
+- [x] 05-01-PLAN.md — Scoring engine + feedback templates (TDD: compute_confidence, generate_feedback)
 - [ ] 05-02-PLAN.md — Pipeline Step 6 integration + SQLite persistence + DB fetch functions
 - [ ] 05-03-PLAN.md — Dashboard finalization (Plotly charts, video, feedback) + History page
 
