@@ -14,6 +14,9 @@ from utils.file_manager import save_upload, get_file_size_mb, allowed_file
 from database.init import insert_interview
 from modules.speech_analysis import analyze_speech
 from modules.visual_analysis import analyze_visual
+from modules.scoring import compute_confidence, generate_feedback, calc_filler_rate
+from database.init import update_interview
+import json
 
 # Must be the first Streamlit command
 st.set_page_config(
@@ -249,9 +252,6 @@ def render_upload_page():
                         )
                         st.dataframe(emotion_df, use_container_width=True, hide_index=True)
 
-                    progress_bar.progress(100, text="Pipeline complete!")
-                    status.update(label="Analysis complete", state="complete", expanded=False)
-
                 except Exception as e:
                     # Visual analysis is non-critical — pipeline continues without it
                     st.warning(f"⚠️ Visual analysis encountered an issue: {str(e)}")
@@ -260,8 +260,100 @@ def render_upload_page():
                     # Set defaults so dashboard doesn't crash
                     st.session_state.last_eye_contact = None
                     st.session_state.last_emotion = None
-                    progress_bar.progress(100, text="Pipeline complete!")
-                    status.update(label="Analysis complete (visual unavailable)", state="complete", expanded=False)
+                    # Provide defaults for scoring even when visual analysis fails
+                    default_eye_result = None   # compute_confidence handles None-equivalent
+                    default_emotion_result = None
+
+                # ── Step 6: Confidence scoring, feedback, and persistence ──
+                progress_bar.progress(95, text="Computing confidence score...")
+                st.write("📊 Computing confidence score and generating feedback...")
+
+                # Extract values from analysis results (handling None for failed visual analysis)
+                eye_result = st.session_state.get("last_eye_contact")
+                emotion_result = st.session_state.get("last_emotion")
+                eye_contact_pct = eye_result.contact_percentage if eye_result is not None else 0.0
+                dominant_emotion = emotion_result.dominant_emotion if emotion_result is not None else "uncertain"
+
+                # Calculate filler rate
+                filler_rate = calc_filler_rate(speech_result.total_filler_count, speech_result.total_words)
+
+                # Compute confidence scores
+                confidence = compute_confidence(
+                    eye_contact_pct=eye_contact_pct,
+                    filler_rate_per_100=filler_rate,
+                    wpm=speech_result.wpm,
+                    speed_classification=speech_result.speed_classification,
+                    dominant_emotion=dominant_emotion,
+                )
+
+                # Generate feedback report
+                feedback = generate_feedback(
+                    confidence=confidence,
+                    eye_contact_pct=eye_contact_pct,
+                    filler_rate_per_100=filler_rate,
+                    filler_count=speech_result.total_filler_count,
+                    wpm=speech_result.wpm,
+                    speed_classification=speech_result.speed_classification,
+                    dominant_emotion=dominant_emotion,
+                )
+
+                # Store in session state for Dashboard display
+                st.session_state.last_confidence = confidence
+                st.session_state.last_feedback = feedback
+
+                # Persist all results to SQLite
+                st.write("💾 Saving results to database...")
+
+                # Serialize complex data to JSON for DB storage
+                transcript_json = json.dumps([
+                    {"start": seg.start, "end": seg.end, "text": seg.text}
+                    for seg in transcript.segments
+                ]) if transcript else None
+
+                filler_words_json = json.dumps([
+                    {"word": fw.word, "count": fw.count}
+                    for fw in speech_result.filler_words
+                ]) if speech_result.filler_words else None
+
+                emotion_distribution_json = json.dumps(
+                    emotion_result.emotion_distribution
+                ) if emotion_result and emotion_result.emotion_distribution else None
+
+                # Build single UPDATE call with all fields (D-13: single write)
+                update_interview(
+                    interview_id=interview_id,
+                    # Transcription
+                    transcript_text=transcript.full_text if transcript else None,
+                    transcript_json=transcript_json,
+                    # Speech analysis
+                    filler_words_json=filler_words_json,
+                    total_filler_count=speech_result.total_filler_count,
+                    top_filler=speech_result.top_filler,
+                    wpm=speech_result.wpm,
+                    speed_classification=speech_result.speed_classification,
+                    total_words=speech_result.total_words,
+                    # Visual analysis
+                    eye_contact_percentage=eye_contact_pct,
+                    eye_contact_frames=eye_result.contact_frames if eye_result else None,
+                    dominant_emotion=dominant_emotion,
+                    emotion_distribution_json=emotion_distribution_json,
+                    # Confidence scores
+                    confidence_eye_contact=confidence.eye_contact_score,
+                    confidence_filler=confidence.filler_score,
+                    confidence_pacing=confidence.pacing_score,
+                    confidence_emotion=confidence.emotion_score,
+                    confidence_clarity=confidence.clarity_score,
+                    confidence_composite=confidence.composite,
+                    confidence_classification=confidence.classification,
+                    # Feedback
+                    feedback_text=feedback,
+                )
+
+                st.write(f"✅ Confidence score: **{confidence.composite:.0f}/100** ({confidence.classification})")
+                st.write(f"✅ Feedback report generated")
+
+                progress_bar.progress(100, text="Pipeline complete!")
+                status.update(label="Analysis complete", state="complete", expanded=False)
 
                 st.success("✅ Analysis complete! Visit the **Dashboard** page to view detailed results.")
                 st.rerun()
