@@ -297,7 +297,7 @@ def render_signal_strip(
         ("Filler words", str(speech.total_filler_count)),
     ]
 
-    html = ['<div class="signal-strip" aria-label="Supporting interview metrics">']
+    html = ['<div class="evidence-grid" aria-label="Supporting interview metrics">']
     for label, value in items:
         html.append(
             textwrap.dedent(f"""
@@ -316,10 +316,14 @@ def render_sidebar() -> None:
     with st.sidebar:
         st.markdown(
             textwrap.dedent("""
-            <div class="brand-block">
-                <div class="brand-icon">⧩</div>
+            <div class="brand-profile">
+                <div class="brand-kicker">Local analysis workspace</div>
                 <h2>Interview Intelligence</h2>
-                <p class="brand-subtitle">Local feedback for pacing, clarity, eye contact, and overall interview quality.</p>
+                <p class="brand-subtitle">Speech, presence, and confidence review for practice interviews.</p>
+                <div class="brand-meta">
+                    <span>Private by default</span>
+                    <span>v0.1.0</span>
+                </div>
             </div>
             """),
             unsafe_allow_html=True,
@@ -350,7 +354,7 @@ def render_sidebar() -> None:
             score_label = f"{confidence.composite:.0f}/100" if confidence is not None else "Pending"
             st.markdown(
                 textwrap.dedent(f"""
-                <div class="sidebar-card">
+                <div class="sidebar-note">
                     <p class="sidebar-label">Latest session</p>
                     <h4>{escape(str(latest_id))}</h4>
                     <p>Most recent confidence score: {escape(score_label)}</p>
@@ -361,19 +365,19 @@ def render_sidebar() -> None:
 
         st.markdown(
             textwrap.dedent("""
-            <div class="sidebar-card sidebar-card-muted">
+            <div class="sidebar-note sidebar-note-muted">
                 <p class="sidebar-label">Current flow</p>
                 <ul>
                     <li>Upload a local recording.</li>
-                    <li>Review the executive summary.</li>
-                    <li>Open details only when needed.</li>
+                    <li>Review the interview dossier.</li>
+                    <li>Reopen prior sessions from the archive.</li>
                 </ul>
             </div>
             """),
             unsafe_allow_html=True,
         )
 
-        st.caption("v0.1.0 — Local-first analysis")
+        st.caption("v0.1.0 - Local-first analysis")
 
 
 def run_analysis_pipeline(uploaded_file) -> None:
@@ -528,11 +532,11 @@ def render_upload_page() -> None:
         )
         st.markdown(
             textwrap.dedent("""
-            <div class="process-strip">
-                <span>Upload</span>
-                <span>Transcribe</span>
-                <span>Interpret</span>
-                <span>Report</span>
+            <div class="process-meta" aria-label="Analysis stages">
+                <span><strong>01</strong> Upload</span>
+                <span><strong>02</strong> Transcribe</span>
+                <span><strong>03</strong> Interpret</span>
+                <span><strong>04</strong> Report</span>
             </div>
             """),
             unsafe_allow_html=True,
@@ -551,7 +555,7 @@ def render_upload_page() -> None:
             size_mb = uploaded_file.size / (1024 * 1024)
             st.markdown(
                 textwrap.dedent(f"""
-                <div class="file-summary">
+                <div class="file-evidence">
                     <div>
                         <p class="file-label">File</p>
                         <h4>{escape(uploaded_file.name)}</h4>
@@ -584,7 +588,7 @@ def render_upload_page() -> None:
         )
         st.markdown(
             textwrap.dedent("""
-            <div class="checklist">
+            <div class="section-list">
                 <div><strong>Executive summary</strong><span>Overall confidence classification and coaching priorities.</span></div>
                 <div><strong>Behavioral signals</strong><span>Pacing, filler control, eye contact, and expression context.</span></div>
                 <div><strong>Supporting record</strong><span>Transcript, saved history, and raw metric details.</span></div>
@@ -658,7 +662,7 @@ def render_dashboard_page() -> None:
         )
         st.markdown(
             textwrap.dedent(f"""
-            <div class="score-lockup tone-{escape(score_summary["tone"])}">
+            <div class="score-editorial tone-{escape(score_summary["tone"])}">
                 <div>
                     <p class="score-label">Overall confidence</p>
                     <h2>{confidence.composite:.0f}</h2>
@@ -759,11 +763,11 @@ def render_dashboard_page() -> None:
                 ).sort_values("Frequency", ascending=True)
                 is_light = st.session_state.theme == "Light"
                 color_scale = (
-                    ["#d4dcd6", "#8a9e8e", "#b6975d"] if is_light
-                    else ["#2f332f", "#6f8068", "#b6a06a"]
+                    ["#e6e1d8", "#b9b1a4", "#716b61"] if is_light
+                    else ["#252525", "#5d5a52", "#d8d1c3"]
                 )
-                font_c = "#171a19" if is_light else "#eceeed"
-                tick_c = "#555e59" if is_light else "#8a8a8a"
+                font_c = "#191817" if is_light else "#f3f1ea"
+                tick_c = "#6f6a60" if is_light else "#9a968d"
                 fig_emotion = px.bar(
                     emotion_df,
                     x="Frequency",
@@ -926,6 +930,7 @@ def render_history_page() -> None:
         )
 
     df = pd.DataFrame(table_data)
+    st.markdown('<span class="archive-summary"></span>', unsafe_allow_html=True)
     summary_cols = st.columns(4)
     average_score = sum(numeric_scores) / len(numeric_scores) if numeric_scores else 0.0
     best_score = max(numeric_scores) if numeric_scores else 0.0
