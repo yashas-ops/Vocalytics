@@ -81,7 +81,7 @@ def load_css(theme: str) -> None:
                 --surface-inset: #e6e1d8;
                 --text: var(--foreground);
                 --text-muted: var(--muted-foreground);
-                --text-soft: #8b857a;
+                --text-soft: #625c52;
                 --text-card: var(--foreground);
                 --text-card-muted: var(--muted-foreground);
                 --accent-hover: #3a3733;
