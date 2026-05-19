@@ -59,26 +59,40 @@ def test_menu_css_only_hides_streamlit_theme_selector():
     assert '[data-testid="stAppOptions"]' not in css
 
 
-def test_light_theme_sidebar_tokens_are_visibly_separated():
-    """Light theme sidebar surfaces need clear separation from the page."""
+def test_light_theme_uses_readcv_editorial_tokens():
+    """Light mode should use warm editorial surfaces and subtle dividers."""
     source = APP_SOURCE.read_text(encoding="utf-8")
 
-    assert "--background: #faf9f7;" in source
-    assert "--sidebar-bg: #f2f0e8;" in source
-    assert "--muted: #f2f0e8;" in source
-    assert "--border: rgba(0, 0, 0, 0.08);" in source
-    assert "--muted-foreground: #555e59;" in source
+    assert "--background: #f7f5ef;" in source
+    assert "--sidebar-bg: #f7f5ef;" in source
+    assert "--card: #fffefa;" in source
+    assert "--muted: #ece8df;" in source
+    assert "--border: rgba(25, 24, 23, 0.12);" in source
+    assert "--muted-foreground: #6f6a60;" in source
 
 
-def test_css_uses_restrained_surface_and_motion_contracts():
-    """Core visual tokens should match the premium UI contract."""
+def test_css_uses_readcv_surface_and_motion_contracts():
+    """Core CSS should prefer Read.cv-like rules over glossy dashboard chrome."""
     css = (APP_SOURCE.parent / "assets" / "styles.css").read_text(encoding="utf-8")
 
-    assert "--radius: 8px;" in css
-    assert "transition: background 180ms ease, border-color 180ms ease, transform 120ms ease" in css
+    assert "--radius: 6px;" in css
+    assert "--shadow: none;" in css
+    assert "border-bottom: 1px solid var(--border);" in css
+    assert "letter-spacing: 0;" in css
     assert "min-height: 44px;" in css
-    assert "transform: translateY(-1px);" in css
     assert "transform: scale(1.05)" not in css
+    assert "border-radius: 999px" not in css
+
+
+def test_app_markup_contains_editorial_readcv_hooks():
+    """The app should expose semantic hooks for the minimalist editorial redesign."""
+    source = APP_SOURCE.read_text(encoding="utf-8")
+
+    assert "brand-profile" in source
+    assert "process-meta" in source
+    assert "score-editorial" in source
+    assert "evidence-grid" in source
+    assert "archive-summary" in source
 
 
 def test_css_keeps_streamlit_sidebar_and_theme_controls_accessible():
