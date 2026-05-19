@@ -61,88 +61,39 @@ def load_css(theme: str) -> None:
             textwrap.dedent("""
             <style>
             .stApp {
-                --background: #faf9f7;
-                --foreground: #171a19;
-                --card: #ffffff;
-                --border: rgba(0, 0, 0, 0.08);
-                --muted: #f2f0e8;
-                --muted-foreground: #555e59;
-                --primary: #3f6f64;
-                --primary-foreground: #ffffff;
-                --accent: #588075;
-                --accent-foreground: #ffffff;
+                --background: #f7f5ef;
+                --foreground: #191817;
+                --card: #fffefa;
+                --border: rgba(25, 24, 23, 0.12);
+                --muted: #ece8df;
+                --muted-foreground: #6f6a60;
+                --primary: #191817;
+                --primary-foreground: #fffefa;
+                --accent: #716b61;
+                --accent-foreground: #fffefa;
                 
                 --bg: var(--background);
-                --bg-subtle: #f4f2ec;
-                --sidebar-bg: #f2f0e8;
+                --bg-subtle: #efebe2;
+                --sidebar-bg: #f7f5ef;
                 --surface: var(--card);
-                --surface-raised: #f8f7f2;
+                --surface-raised: #fffefa;
                 --surface-muted: var(--muted);
-                --surface-inset: #ece9e0;
+                --surface-inset: #e6e1d8;
                 --text: var(--foreground);
                 --text-muted: var(--muted-foreground);
-                --text-soft: #7a8480;
+                --text-soft: #8b857a;
                 --text-card: var(--foreground);
                 --text-card-muted: var(--muted-foreground);
-                --accent-hover: #4a7d72;
+                --accent-hover: #3a3733;
                 --accent-text: var(--primary-foreground);
-                --accent-soft: rgba(63, 111, 100, 0.12);
-                --success: #3f7a62;
-                --warning: #9a7642;
-                --danger: #8f4a42;
-                --shadow: 0 16px 36px rgba(31, 34, 31, 0.08);
-                --shadow-soft: 0 8px 18px rgba(31, 34, 31, 0.06);
-                --border-strong: rgba(0, 0, 0, 0.12);
-                --radius: 8px;
-            }
-
-            /* Streamlit internal component overrides */
-            div[data-testid="stStatusWidget"] {
-                background: #ffffff !important;
-                border-color: rgba(0, 0, 0, 0.08) !important;
-            }
-            div[data-testid="stStatusWidget"] * {
-                color: #171a19 !important;
-            }
-            .stAlert {
-                background: #ffffff !important;
-                border-color: rgba(0, 0, 0, 0.08) !important;
-            }
-            section[data-testid="stSidebar"] .stRadio label p {
-                color: #171a19 !important;
-            }
-            section[data-testid="stSidebar"] .stRadio label:has(input:checked) p {
-                color: #171a19 !important;
-            }
-            div[data-testid="stMetric"] {
-                background: #ffffff !important;
-            }
-            .stTabs [data-baseweb="tab-list"] {
-                background: #f2f0e8 !important;
-            }
-            .stTabs [data-baseweb="tab"] {
-                color: #5b635e !important;
-            }
-            .stTabs [data-baseweb="tab"][aria-selected="true"] {
-                background: #f8f7f2 !important;
-                color: #171a19 !important;
-            }
-            .stDataFrame thead tr th {
-                background: #f2f0e8 !important;
-                color: #5b635e !important;
-            }
-            .streamlit-expanderHeader {
-                color: #171a19 !important;
-            }
-            textarea:disabled {
-                color: #3f4742 !important;
-                background: #f2f0e8 !important;
-            }
-            [data-testid="collapsedControl"],
-            [data-testid="stSidebarCollapseButton"] {
-                background-color: #f2f0e8 !important;
-                border-color: rgba(0, 0, 0, 0.12) !important;
-                color: #171a19 !important;
+                --accent-soft: rgba(25, 24, 23, 0.08);
+                --success: #66755f;
+                --warning: #8a6f3e;
+                --danger: #8a5149;
+                --shadow: none;
+                --shadow-soft: none;
+                --border-strong: rgba(25, 24, 23, 0.20);
+                --radius: 6px;
             }
             </style>
             """),
