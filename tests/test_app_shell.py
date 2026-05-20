@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
@@ -77,9 +78,9 @@ def test_css_uses_editorial_shell_contract():
 
     assert "--shadow-soft: none;" in css
     assert "backdrop-filter: blur" not in css
-    assert "box-shadow:\n    0 22px" not in css
+    assert re.search(r"box-shadow\s*:\s*0\s+22px", css) is None
     assert "border-radius: 12px;" not in css
-    assert ".top-nav{" in css
+    assert re.search(r"\.top-nav\s*\{", css) is not None
     assert ".score-editorial" in css
     assert ".file-evidence" in css
 
@@ -97,7 +98,7 @@ def test_css_uses_readcv_surface_and_motion_contracts():
     assert "border-radius: 999px" not in css
 
 
-def test_app_markup_contains_editorial_readcv_hooks():
+def test_app_markup_exposes_editorial_readcv_hooks():
     """The app should expose stable hooks for the approved Figma mapping."""
     source = APP_SOURCE.read_text(encoding="utf-8")
 
