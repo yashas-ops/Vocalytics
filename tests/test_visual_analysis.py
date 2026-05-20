@@ -105,17 +105,22 @@ class MockLandmark:
 def _build_straight_face_landmarks() -> list:
     """Build 478 mock landmarks simulating a forward-facing face.
 
-    Key points (indices 1, 199, 33, 263, 61, 291) are positioned
-    as they would be for a straight-on face in normalized coords.
+    Key points (indices 1, 199, 33, 263, 61, 291) are positioned using
+    perspective projection of the canonical 3D face model with identity
+    rotation (forward-facing) at a reasonable distance.
+
+    The positions were computed as the perspective projection of the
+    MODEL_POINTS_3D with R=I, t=[0, 0, 2000], camera matrix with
+    focal_length=640 and center=(320, 240) — resulting in yaw/pitch ≈ 0°.
     """
     # Key landmark positions for a forward-facing face (normalized 0-1)
     key_positions = {
-        1:   (0.5, 0.4, 0.0),    # Nose tip
-        199: (0.5, 0.7, 0.0),    # Chin
-        33:  (0.35, 0.35, 0.0),  # Left eye left corner
-        263: (0.65, 0.35, 0.0),  # Right eye right corner
-        61:  (0.38, 0.55, 0.0),  # Left mouth corner
-        291: (0.62, 0.55, 0.0),  # Right mouth corner
+        1:   (0.5, 0.5, 0.0),       # Nose tip
+        199: (0.5, 0.273, -0.1),     # Chin
+        33:  (0.379, 0.621, 0.1),    # Left eye left corner
+        263: (0.621, 0.621, 0.1),    # Right eye right corner
+        61:  (0.42, 0.393, -0.05),   # Left mouth corner
+        291: (0.58, 0.393, -0.05),   # Right mouth corner
     }
 
     landmarks = []
@@ -190,11 +195,11 @@ def test_emotion_soft_voting():
     from modules.visual_analysis import _aggregate_emotions
 
     mock_results: List[Dict] = [
-        {"emotion": {"angry": 0.1, "happy": 0.8, "neutral": 0.1},
+        {"emotion": {"angry": 10.0, "happy": 80.0, "neutral": 10.0},
          "dominant_emotion": "happy"},
-        {"emotion": {"angry": 0.1, "happy": 0.7, "neutral": 0.2},
+        {"emotion": {"angry": 10.0, "happy": 70.0, "neutral": 20.0},
          "dominant_emotion": "happy"},
-        {"emotion": {"angry": 0.3, "happy": 0.1, "neutral": 0.6},
+        {"emotion": {"angry": 30.0, "happy": 10.0, "neutral": 60.0},
          "dominant_emotion": "neutral"},
     ]
 
@@ -216,10 +221,10 @@ def test_emotion_confidence_threshold():
     from modules.visual_analysis import _aggregate_emotions
 
     mock_results: List[Dict] = [
-        {"emotion": {"angry": 0.1, "happy": 0.8, "neutral": 0.1},
+        {"emotion": {"angry": 10.0, "happy": 80.0, "neutral": 10.0},
          "dominant_emotion": "happy"},
         # "neutral" at 40% confidence — below 50% threshold, should be excluded
-        {"emotion": {"angry": 0.3, "fear": 0.3, "neutral": 0.4},
+        {"emotion": {"angry": 30.0, "fear": 30.0, "neutral": 40.0},
          "dominant_emotion": "neutral"},
     ]
 
@@ -258,8 +263,8 @@ def test_analyze_visual_integration():
     )
 
     with (
-        patch("modules.visual_analysis.load_mediapipe_face_mesh") as mock_load_mesh,
-        patch("modules.visual_analysis.load_deepface_model") as mock_load_df,
+        patch("utils.helpers.load_mediapipe_face_mesh") as mock_load_mesh,
+        patch("utils.helpers.load_deepface_model") as mock_load_df,
         patch("modules.visual_analysis.extract_keyframes") as mock_extract,
         patch("modules.visual_analysis.analyze_eye_contact") as mock_eye,
         patch("modules.visual_analysis.analyze_emotions") as mock_emo,

@@ -278,13 +278,16 @@ def analyze_eye_contact(
     frame_results: List[FrameEyeContact] = []
     contact_count = 0
 
+    import mediapipe as mp
+
     for frame, idx in zip(frames, frame_indices):
         # Convert BGR → RGB (D-09)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = face_mesh.process(rgb)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        results = face_mesh.detect(mp_image)
 
-        if results.multi_face_landmarks:
-            landmarks = results.multi_face_landmarks[0].landmark
+        if results.face_landmarks:
+            landmarks = results.face_landmarks[0]
             yaw, pitch, roll = _compute_head_pose(landmarks, image_shape)
 
             if yaw is not None:
@@ -440,15 +443,18 @@ def analyze_emotions(
 
     deepface_results: List[Dict] = []
 
+    import mediapipe as mp
+
     for frame in frames:
         # Convert to RGB for MediaPipe
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        results = face_mesh.process(rgb)
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        results = face_mesh.detect(mp_image)
 
         # Determine image to pass to DeepFace
-        if results.multi_face_landmarks:
+        if results.face_landmarks:
             # D-15: Crop to face ROI for faster DeepFace processing
-            landmarks = results.multi_face_landmarks[0].landmark
+            landmarks = results.face_landmarks[0]
             analysis_frame = _crop_face_roi(frame, landmarks)
         else:
             analysis_frame = frame
