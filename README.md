@@ -1,3 +1,12 @@
+---
+title: Vocalytics
+emoji: 🎤
+colorFrom: green
+colorTo: yellow
+sdk: docker
+app_port: 7860
+---
+
 # Vocalytics
 
 AI-powered interview analyzer. Upload or record mock interviews and get instant feedback on speaking pace, filler words, eye contact, facial expressions, and confidence — all running locally with open-source models.
