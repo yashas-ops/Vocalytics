@@ -4,9 +4,12 @@ import os
 import uuid
 import json
 import asyncio
+import logging
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional
+
+logger = logging.getLogger("ctracker")
 
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
@@ -150,7 +153,8 @@ async def _run_pipeline(job_id: str, video_path: str, candidate_name: str, role_
         emotion_result: Optional[Any] = None
         try:
             eye_result, emotion_result = analyze_visual(video_path)
-        except Exception:
+        except Exception as e:
+            logger.warning("Visual analysis failed: %s", e)
             eye_result = None
             emotion_result = None
 

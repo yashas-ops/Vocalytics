@@ -23,6 +23,7 @@ Dependencies (none modified):
 - modules.eye_mesh_loader: load_video_face_mesh
 """
 
+import logging
 from typing import List, Optional, Tuple
 
 import cv2
@@ -33,6 +34,8 @@ from modules.models import EmotionResult, EyeContactResult, FrameEyeContact
 from modules.visual_analysis import analyze_emotions, extract_keyframes
 from modules.eye_dynamic_weighting import dynamic_combined_score
 from modules.eye_temporal_smoothing import smooth_frame_results
+
+logger = logging.getLogger("eye_contact_enhanced")
 
 # ---------------------------------------------------------------------------
 # 3D Face Model for PnP Head Pose
@@ -362,35 +365,52 @@ def analyze_visual(
     from utils.helpers import load_deepface_model, load_mediapipe_face_mesh
     from modules.eye_mesh_loader import load_video_face_mesh
 
+    eye_contact = EyeContactResult(contact_percentage=0.0, total_frames=0, contact_frames=0, frame_results=[])
+    emotions = EmotionResult(dominant_emotion="uncertain", emotion_distribution={}, frames_analyzed=0)
+
     # Video-mode FaceLandmarker with frame-to-frame temporal tracking
-    # (equivalent to legacy static_image_mode=False + refine_landmarks=True)
-    video_mesh = load_video_face_mesh()
+    video_mesh = None
+    tasks_mesh = None
+    try:
+        video_mesh = load_video_face_mesh()
+    except Exception as e:
+        logger.warning("Failed to load video face mesh: %s", e)
 
-    # Tasks API FaceLandmarker for emotion analysis (requires different API)
-    tasks_mesh = load_mediapipe_face_mesh()
+    try:
+        tasks_mesh = load_mediapipe_face_mesh()
+    except Exception as e:
+        logger.warning("Failed to load image face mesh: %s", e)
 
-    load_deepface_model()
+    try:
+        load_deepface_model()
+    except Exception as e:
+        logger.warning("Failed to load DeepFace model: %s", e)
 
-    frames, frame_indices = extract_keyframes(video_path, max_frames=ENHANCED_MAX_FRAMES)
+    try:
+        frames, frame_indices = extract_keyframes(video_path, max_frames=ENHANCED_MAX_FRAMES)
+    except Exception as e:
+        logger.warning("Failed to extract keyframes: %s", e)
+        frames, frame_indices = [], []
 
     if not frames:
-        video_mesh.close()
-        empty_eye = EyeContactResult(
-            contact_percentage=0.0,
-            total_frames=0,
-            contact_frames=0,
-            frame_results=[],
-        )
-        empty_emotion = EmotionResult(
-            dominant_emotion="uncertain",
-            emotion_distribution={},
-            frames_analyzed=0,
-        )
-        return empty_eye, empty_emotion
+        return eye_contact, emotions
 
-    eye_result = analyze_eye_contact_enhanced(frames, video_mesh, frame_indices)
-    emotion_result = analyze_emotions(frames, tasks_mesh, frame_indices)
+    if video_mesh is not None:
+        try:
+            eye_contact = analyze_eye_contact_enhanced(frames, video_mesh, frame_indices)
+        except Exception as e:
+            logger.warning("Eye contact analysis failed: %s", e)
 
-    video_mesh.close()
+    if tasks_mesh is not None:
+        try:
+            emotions = analyze_emotions(frames, tasks_mesh, frame_indices)
+        except Exception as e:
+            logger.warning("Emotion analysis failed: %s", e)
 
-    return eye_result, emotion_result
+    if video_mesh is not None:
+        try:
+            video_mesh.close()
+        except Exception:
+            pass
+
+    return eye_contact, emotions
