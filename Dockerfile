@@ -9,8 +9,8 @@ RUN cd frontend && npm run build
 # Stage 2: Python runtime
 FROM python:3.11-slim
 
-# Install ffmpeg (required for audio extraction)
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+# Install system dependencies: ffmpeg + MediaPipe OpenGL libs
+RUN apt-get update && apt-get install -y ffmpeg libgles2 libegl1 libgl1 && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
