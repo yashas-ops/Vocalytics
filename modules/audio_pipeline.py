@@ -1,5 +1,6 @@
 """ffmpeg audio extraction: 16kHz mono WAV via subprocess. No moviepy. Per architecture."""
 
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -8,17 +9,23 @@ import imageio_ffmpeg
 from modules.models import AudioExtractionResult
 
 _FFMPEG_PATH: str | None = None
+_FFPROBE_PATH: str | None = None
 
 
 def _get_ffmpeg() -> str:
     global _FFMPEG_PATH
     if _FFMPEG_PATH is None:
-        _FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
+        system = shutil.which("ffmpeg")
+        _FFMPEG_PATH = system if system else imageio_ffmpeg.get_ffmpeg_exe()
     return _FFMPEG_PATH
 
 
 def _get_ffprobe() -> str:
-    return _get_ffmpeg().replace("ffmpeg", "ffprobe")
+    global _FFPROBE_PATH
+    if _FFPROBE_PATH is None:
+        system = shutil.which("ffprobe")
+        _FFPROBE_PATH = system if system else _get_ffmpeg().replace("ffmpeg", "ffprobe")
+    return _FFPROBE_PATH
 
 
 def extract_audio(video_path: str, temp_dir: str | None = None) -> AudioExtractionResult:
