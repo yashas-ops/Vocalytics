@@ -12,9 +12,10 @@ import json
 from datetime import datetime
 from typing import Optional
 
-# Database file path — created in project root
+# Database file path — configurable via DATABASE_PATH env var, defaults to project dir
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(os.path.dirname(DB_DIR), "database", "app.db")
+_DEFAULT_DB = os.path.join(os.path.dirname(DB_DIR), "database", "app.db")
+DB_PATH = os.getenv("DATABASE_PATH", _DEFAULT_DB)
 
 
 def get_connection() -> sqlite3.Connection:
@@ -30,11 +31,10 @@ def get_connection() -> sqlite3.Connection:
 
 
 def init_db() -> None:
-    """Create the interviews table if it does not exist.
+    """Create tables if they do not exist.
 
-    Single-table design (D-06) — all analysis results stored as columns.
-    JSON fields for complex nested data (segments, filler words, emotions).
-    Score fields defined now (D-08) so schema is stable through Phase 5.
+    interviews table (D-06) stores all analysis results.
+    users table stores registered accounts.
     """
     conn = get_connection()
     conn.execute("""
@@ -43,6 +43,10 @@ def init_db() -> None:
             created_at TEXT NOT NULL,
             video_path TEXT NOT NULL,
             duration_sec REAL,
+
+            -- Candidate info
+            candidate_name TEXT DEFAULT 'Candidate',
+            role_name TEXT DEFAULT 'Role',
 
             -- Phase 2: Transcription
             transcript_text TEXT,
@@ -78,6 +82,14 @@ def init_db() -> None:
             status TEXT DEFAULT 'pending'
         )
     """)
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
     conn.commit()
     conn.close()
 
@@ -87,14 +99,14 @@ def generate_id() -> str:
     return str(uuid.uuid4())[:8]
 
 
-def insert_interview(video_path: str) -> str:
+def insert_interview(video_path: str, candidate_name: str = "Candidate", role_name: str = "Role", user_id: Optional[int] = None) -> str:
     """Insert a new interview record and return its ID."""
     interview_id = generate_id()
     created_at = datetime.utcnow().isoformat()
     conn = get_connection()
     conn.execute(
-        "INSERT INTO interviews (id, created_at, video_path, status) VALUES (?, ?, ?, 'pending')",
-        (interview_id, created_at, video_path)
+        "INSERT INTO interviews (id, created_at, video_path, candidate_name, role_name, user_id, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')",
+        (interview_id, created_at, video_path, candidate_name, role_name, user_id)
     )
     conn.commit()
     conn.close()
@@ -156,5 +168,72 @@ def fetch_all_interviews() -> list:
     return [dict(row) for row in rows]
 
 
+def migrate_add_candidate_fields() -> None:
+    """Add candidate_name and role_name columns if they don't exist (backward compat)."""
+    conn = get_connection()
+    existing = [row[1] for row in conn.execute("PRAGMA table_info(interviews)").fetchall()]
+    if "candidate_name" not in existing:
+        conn.execute("ALTER TABLE interviews ADD COLUMN candidate_name TEXT DEFAULT 'Candidate'")
+    if "role_name" not in existing:
+        conn.execute("ALTER TABLE interviews ADD COLUMN role_name TEXT DEFAULT 'Role'")
+    conn.commit()
+    conn.close()
+
+
+def migrate_add_user_id() -> None:
+    """Add user_id column to interviews if it doesn't exist (backward compat)."""
+    conn = get_connection()
+    existing = [row[1] for row in conn.execute("PRAGMA table_info(interviews)").fetchall()]
+    if "user_id" not in existing:
+        conn.execute("ALTER TABLE interviews ADD COLUMN user_id INTEGER DEFAULT NULL")
+    conn.commit()
+    conn.close()
+
+
+def create_user(username: str, password_hash: str) -> int:
+    """Insert a new user and return the user ID."""
+    conn = get_connection()
+    created_at = datetime.utcnow().isoformat()
+    cursor = conn.execute(
+        "INSERT INTO users (username, password_hash, created_at) VALUES (?, ?, ?)",
+        (username, password_hash, created_at)
+    )
+    user_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return user_id
+
+
+def fetch_user_by_username(username: str) -> Optional[dict]:
+    """Fetch a user record by username (case-insensitive)."""
+    conn = get_connection()
+    row = conn.execute(
+        "SELECT * FROM users WHERE LOWER(username) = LOWER(?)", (username,)
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def fetch_user_by_id(user_id: int) -> Optional[dict]:
+    """Fetch a user record by ID."""
+    conn = get_connection()
+    row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def fetch_interviews_by_user(user_id: int) -> list:
+    """Fetch interviews belonging to a specific user only."""
+    conn = get_connection()
+    rows = conn.execute(
+        "SELECT * FROM interviews WHERE user_id = ? ORDER BY created_at DESC",
+        (user_id,)
+    ).fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+
 # Auto-initialize on import
 init_db()
+migrate_add_candidate_fields()
+migrate_add_user_id()

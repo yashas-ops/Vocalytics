@@ -12,7 +12,8 @@ import plotly.express as px
 import plotly.io as pio
 import streamlit as st
 
-from database.init import fetch_all_interviews, fetch_interview, insert_interview, update_interview
+from database.init import fetch_all_interviews, fetch_interview, fetch_interviews_by_user, insert_interview, update_interview
+from modules.auth import authenticate_user, register_user
 from modules.audio_pipeline import extract_audio
 from modules.models import (
     ConfidenceScores,
@@ -58,45 +59,24 @@ def load_css(theme: str) -> None:
 
     if theme == "Light":
         st.markdown(
-            textwrap.dedent("""
+            """
             <style>
-            .stApp {
-                --background: #f7f5ef;
-                --foreground: #191817;
-                --card: #fffefa;
-                --border: rgba(25, 24, 23, 0.12);
-                --muted: #ece8df;
-                --muted-foreground: #6f6a60;
-                --primary: #191817;
-                --primary-foreground: #fffefa;
-                --accent: #716b61;
-                --accent-foreground: #fffefa;
-                
-                --bg: var(--background);
-                --bg-subtle: #efebe2;
-                --sidebar-bg: #f7f5ef;
-                --surface: var(--card);
-                --surface-raised: #fffefa;
-                --surface-muted: var(--muted);
-                --surface-inset: #e6e1d8;
-                --text: var(--foreground);
-                --text-muted: var(--muted-foreground);
-                --text-soft: #625c52;
-                --text-card: var(--foreground);
-                --text-card-muted: var(--muted-foreground);
-                --accent-hover: #3a3733;
-                --accent-text: var(--primary-foreground);
-                --accent-soft: rgba(25, 24, 23, 0.08);
-                --success: #66755f;
-                --warning: #8a6f3e;
-                --danger: #8a5149;
-                --shadow: none;
-                --shadow-soft: none;
-                --border-strong: rgba(25, 24, 23, 0.20);
-                --radius: 6px;
+            :root{
+              --background: #f7f5ef;
+              --foreground: #191817;
+              --sidebar-bg: #f7f5ef;
+              --card: #fffefa;
+              --muted: #ece8df;
+              --border: rgba(25, 24, 23, 0.12);
+              --border-strong: rgba(25, 24, 23, 0.20);
+              --muted-foreground: #6f6a60;
+              --primary: #191817;
+              --primary-foreground: #fffefa;
+              --accent: #716b61;
+              --accent-foreground: #fffefa;
             }
             </style>
-            """),
+            """,
             unsafe_allow_html=True,
         )
 
@@ -115,6 +95,8 @@ def initialize_session_state() -> None:
         "last_confidence": None,
         "last_feedback": None,
         "theme": "Dark",
+        "user_id": None,
+        "username": None,
     }
 
     for key, value in defaults.items():
@@ -289,10 +271,27 @@ def render_sidebar() -> None:
             st.session_state.theme = theme
             st.rerun()
 
+        if st.session_state.get("user_id"):
+            user_col, logout_col = st.columns([2, 1])
+            user_col.markdown(
+                f"<div style='font-size:0.82rem;color:var(--muted-foreground);padding-top:0.25rem'>"
+                f"{escape(st.session_state.username)}"
+                f"</div>",
+                unsafe_allow_html=True,
+            )
+            if logout_col.button("Logout", key="sidebar_logout"):
+                st.session_state.user_id = None
+                st.session_state.username = None
+                st.session_state.last_interview_id = None
+                st.session_state.page = "Login"
+                st.rerun()
+
+        current_page = st.session_state.page
+        page_index = PAGES.index(current_page) if current_page in PAGES else 0
         selected_page = st.radio(
             "Navigation",
             PAGES,
-            index=PAGES.index(st.session_state.page),
+            index=page_index,
             label_visibility="collapsed",
         )
         if selected_page != st.session_state.page:
@@ -340,7 +339,7 @@ def run_analysis_pipeline(uploaded_file) -> None:
             progress_bar.progress(10, text="Saving upload...")
             st.write("Saving the interview video for local processing.")
             video_path = save_upload(uploaded_file)
-            interview_id = insert_interview(video_path)
+            interview_id = insert_interview(video_path, user_id=st.session_state.user_id)
             st.session_state.last_video_path = video_path
             st.session_state.last_interview_id = interview_id
 
@@ -465,12 +464,66 @@ def run_analysis_pipeline(uploaded_file) -> None:
     st.rerun()
 
 
+def render_login_page() -> None:
+    st.markdown(
+        '<div class="page-header"><h1>Sign in</h1><p class="page-description">Access your interview analysis workspace.</p></div>',
+        unsafe_allow_html=True,
+    )
+    username = st.text_input("Username", placeholder="Enter your username")
+    password = st.text_input("Password", type="password", placeholder="Enter your password")
+    if st.button("Sign in", type="primary", use_container_width=True):
+        if not username or not password:
+            st.error("Please enter both username and password.")
+        else:
+            user_id = authenticate_user(username, password)
+            if user_id is not None:
+                st.session_state.user_id = user_id
+                st.session_state.username = username.strip()
+                st.session_state.page = "Upload"
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
+    st.markdown(
+        "<p style='text-align:center;margin-top:1rem'>Don't have an account? "
+        "<a href='#' onclick='window.location.href = \"?page=Register\"'>Register</a></p>",
+        unsafe_allow_html=True,
+    )
+
+
+def render_register_page() -> None:
+    st.markdown(
+        '<div class="page-header"><h1>Create account</h1><p class="page-description">Register to start tracking your interview practice.</p></div>',
+        unsafe_allow_html=True,
+    )
+    username = st.text_input("Username", placeholder="Choose a username (3\u201330 chars)")
+    password = st.text_input("Password", type="password", placeholder="At least 6 characters")
+    confirm = st.text_input("Confirm password", type="password", placeholder="Re-enter password")
+    if st.button("Create account", type="primary", use_container_width=True):
+        if not username or not password or not confirm:
+            st.error("Please fill in all fields.")
+        elif password != confirm:
+            st.error("Passwords do not match.")
+        else:
+            success, message = register_user(username, password)
+            if success:
+                st.success(message)
+                st.session_state.page = "Login"
+                st.rerun()
+            else:
+                st.error(message)
+    st.markdown(
+        "<p style='text-align:center;margin-top:1rem'>Already have an account? "
+        "<a href='#' onclick='window.location.href = \"?page=Login\"'>Sign in</a></p>",
+        unsafe_allow_html=True,
+    )
+
+
 def render_upload_page() -> None:
     """Render the upload page."""
     render_page_header(
-        "Capture a session",
-        "Upload a practice interview",
-        "Run the local analysis pipeline and move directly into a structured review.",
+        "New session",
+        "Upload interview recording",
+        "Run the local analysis pipeline and move directly into a structured editorial review.",
     )
 
     main_col, side_col = st.columns([1.7, 1], gap="large")
@@ -581,9 +634,9 @@ def render_dashboard_empty_state() -> None:
 def render_dashboard_page() -> None:
     """Render the dashboard page."""
     render_page_header(
-        "Review the session",
-        "Dashboard",
-        "A calm readout of confidence, coaching priorities, and supporting evidence.",
+        "Interview dossier",
+        "Session review",
+        "Read the score, coaching interpretation, transcript, and supporting evidence as one structured report.",
     )
 
     speech: SpeechAnalysisResult | None = st.session_state.get("last_speech_analysis")
@@ -615,11 +668,11 @@ def render_dashboard_page() -> None:
             textwrap.dedent(f"""
             <div class="score-editorial tone-{escape(score_summary["tone"])}">
                 <div>
-                    <p class="score-label">Overall confidence</p>
+                    <p class="score-label">Confidence score</p>
                     <h2>{confidence.composite:.0f}</h2>
                 </div>
                 <div>
-                    <p class="score-classification">{escape(confidence.classification)}</p>
+                    <p class="score-classification">{escape(score_summary["headline"])}</p>
                     <p>{escape(score_summary["body"])}</p>
                 </div>
             </div>
@@ -834,12 +887,12 @@ def render_dashboard_page() -> None:
 def render_history_page() -> None:
     """Render the session history page."""
     render_page_header(
-        "Track progress",
-        "History",
+        "Archive index",
+        "Session history",
         "Reopen saved sessions and compare progress without leaving the current workflow.",
     )
 
-    interviews = fetch_all_interviews()
+    interviews = fetch_interviews_by_user(st.session_state.user_id)
     if not interviews:
         surface_start("surface-hero")
         render_section_header(
@@ -1034,13 +1087,89 @@ def load_interview_to_session(interview_id: str) -> None:
 
 initialize_session_state()
 load_css(st.session_state.theme)
+
+# Auth gate — must run before sidebar to prevent page routing errors
+if not st.session_state.user_id:
+    if st.session_state.page not in ("Login", "Register"):
+        st.session_state.page = "Login"
+    if st.session_state.page == "Login":
+        render_login_page()
+    elif st.session_state.page == "Register":
+        render_register_page()
+    st.stop()
+
+# Native sidebar is hidden via CSS, but we still render its widgets to keep
+# existing navigation/theme logic working during the transition.
 render_sidebar()
 
-page = st.session_state.page
+def render_top_nav() -> None:
+    latest_id = st.session_state.get("last_interview_id")
+    latest_confidence = st.session_state.get("last_confidence")
+    latest_score = (
+        f"{latest_confidence.composite:.0f}/100" if latest_confidence is not None else "Pending"
+    ) if latest_id else "-"
 
+    is_light = st.session_state.theme == "Light"
+    theme_label = "Light" if is_light else "Dark"
+
+    st.markdown(
+        """
+        <div class="top-nav-wrap">
+          <div class="top-nav" role="navigation" aria-label="Primary navigation">
+            <div class="top-nav-left">
+              <div class="top-nav-brand">Interview Intelligence</div>
+              <div class="top-nav-sub">Editorial practice review</div>
+            </div>
+            <div class="top-nav-center" aria-label="Navigation">
+        """,
+        unsafe_allow_html=True,
+    )
+
+    nav_cols = st.columns(len(PAGES), gap="small")
+
+    for idx, page_name in enumerate(PAGES):
+        active = st.session_state.page == page_name
+        with nav_cols[idx]:
+            if st.button(
+                page_name,
+                key=f"topnav-{page_name}-{1 if active else 0}",
+                help="Navigate",
+            ):
+                st.session_state.page = page_name
+                st.rerun()
+
+    st.markdown(
+        """
+            </div>
+            <div class="top-nav-right" aria-label="Session context">
+              <div class="top-nav-theme" aria-label="Current theme">
+                {THEME}
+              </div>
+              <div class="top-nav-latest" aria-label="Latest session">
+                <div class="k">Latest session</div>
+                <div class="v">{LATEST}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        """.replace("{THEME}", theme_label).replace(
+            "{LATEST}", f"{latest_id or '-'} - {latest_score}"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+render_top_nav()
+
+page = st.session_state.page
 if page == "Upload":
     render_upload_page()
 elif page == "Dashboard":
     render_dashboard_page()
 elif page == "History":
     render_history_page()
+
+# Inject theme override LAST so it beats Streamlit's lazy-loaded widget CSS
+if st.session_state.theme == "Light":
+    with open("assets/light.css", encoding="utf-8") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)

@@ -72,6 +72,20 @@ def test_light_theme_uses_readcv_editorial_tokens():
     assert "--muted-foreground: #6f6a60;" in source
 
 
+def test_light_css_uses_editorial_shell_contract():
+    """The light shell should mirror the quiet editorial treatment."""
+    css = (APP_SOURCE.parent / "assets" / "light.css").read_text(encoding="utf-8")
+
+    assert "background: #fffefa !important;" in css
+    assert "border: 1px solid rgba(25, 24, 23, 0.16) !important;" in css
+    assert "radial-gradient(" not in css
+    assert re.search(r"box-shadow\s*:\s*0\s+10px", css) is None
+    assert re.search(r"box-shadow\s*:\s*0\s+14px", css) is None
+    assert "border-radius: 7px" not in css
+    assert ".file-evidence" in css
+    assert ".score-editorial" in css
+
+
 def test_css_uses_editorial_shell_contract():
     """The Read.cv shell should avoid premium glass effects and use quiet surfaces."""
     css = (APP_SOURCE.parent / "assets" / "styles.css").read_text(encoding="utf-8")
