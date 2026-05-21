@@ -1,5 +1,6 @@
 """ffmpeg audio extraction: 16kHz mono WAV via subprocess. No moviepy. Per architecture."""
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -40,6 +41,8 @@ def extract_audio(video_path: str, temp_dir: str | None = None) -> AudioExtracti
     """
     if temp_dir is None:
         temp_dir = str(Path(__file__).resolve().parent.parent / "temp")
+
+    Path(temp_dir).mkdir(parents=True, exist_ok=True)
 
     video_stem = Path(video_path).stem
     audio_path = str(Path(temp_dir) / f"{video_stem}_audio.wav")
