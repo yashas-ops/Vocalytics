@@ -11,6 +11,7 @@ pydub==0.25.1
 numpy>=1.22
 pandas>=2.0
 imageio-ffmpeg>=0.5.1
+tf-keras>=2.16
 streamlit-webrtc==0.47.7
 
 # FastAPI backend for React frontend
