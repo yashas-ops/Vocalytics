@@ -8,6 +8,7 @@ import DashboardView from './components/DashboardView';
 import HistoryView from './components/HistoryView';
 import AboutView from './components/AboutView';
 import WorkflowView from './components/WorkflowView';
+import UseCasesView from './components/UseCasesView';
 
 import { AnalysisReport } from './types';
 import { SAMPLE_INTERVIEWS } from './samples';
@@ -32,7 +33,7 @@ export default function App() {
     }
     return null;
   });
-  const [activeView, setActiveView] = useState<'upload' | 'dashboard' | 'history' | 'login' | 'register' | 'about' | 'workflow'>(user ? 'upload' : 'about');
+  const [activeView, setActiveView] = useState<'upload' | 'dashboard' | 'history' | 'login' | 'register' | 'about' | 'workflow' | 'usecases'>(user ? 'upload' : 'about');
   const [authLoading, setAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeReport, setActiveReport] = useState<AnalysisReport | null>(null);
@@ -268,6 +269,23 @@ export default function App() {
                   </button>
 
                   <button
+                    onClick={() => setActiveView('usecases')}
+                    onMouseEnter={triggerBgHoverStart}
+                    onMouseLeave={triggerBgHoverEnd}
+                    className={`relative px-3 md:px-4 py-2 text-xs md:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                      activeView === 'usecases' ? 'text-black dark:text-[#B9FF66] font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-[#B9FF66]'
+                    }`}
+                  >
+                    Use Cases
+                    {activeView === 'usecases' && (
+                      <motion.div
+                        layoutId="active-tab-line-landing"
+                        className="absolute bottom-[-17px] left-0 right-0 h-[2.5px] bg-[#191A23] dark:bg-[#B9FF66] rounded-full"
+                      />
+                    )}
+                  </button>
+
+                  <button
                     onClick={() => setActiveView('login')}
                     onMouseEnter={triggerBgHoverStart}
                     onMouseLeave={triggerBgHoverEnd}
@@ -392,6 +410,10 @@ export default function App() {
 
             {activeView === 'workflow' && (
               <WorkflowView onNavigate={setActiveView} />
+            )}
+
+            {activeView === 'usecases' && (
+              <UseCasesView onNavigate={setActiveView} />
             )}
 
             {activeView === 'login' && (
