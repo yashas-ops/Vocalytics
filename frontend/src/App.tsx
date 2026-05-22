@@ -33,7 +33,7 @@ export default function App() {
     }
     return null;
   });
-  const [activeView, setActiveView] = useState<'upload' | 'dashboard' | 'history' | 'login' | 'register' | 'about' | 'workflow' | 'usecases'>(user ? 'upload' : 'about');
+  const [activeView, setActiveView] = useState<'upload' | 'dashboard' | 'history' | 'login' | 'register' | 'about' | 'workflow' | 'usecases'>('about');
   const [authLoading, setAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeReport, setActiveReport] = useState<AnalysisReport | null>(null);
@@ -463,7 +463,7 @@ export default function App() {
                         setUser(data);
                         setHistoryItems([]);
                         setActiveReport(null);
-                        setActiveView('upload');
+                        setActiveView('about');
                       }
                     } catch { alert('Login failed'); }
                     setAuthLoading(false);
