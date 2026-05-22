@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Mic, Activity, Eye, TrendingUp, Sparkles, ArrowRight } from 'lucide-react';
+import { Mic, Activity, Eye, TrendingUp, Sparkles, ArrowRight, Globe, Lock, Zap, Target, Shield, Cpu } from 'lucide-react';
 
 const features = [
   {
@@ -24,6 +24,31 @@ const features = [
   },
 ];
 
+const stats = [
+  { icon: Globe, value: '100%', label: 'Local Processing' },
+  { icon: Lock, value: 'Zero', label: 'Cloud Dependencies' },
+  { icon: Zap, value: 'Real-time', label: 'Feedback Loop' },
+  { icon: Cpu, value: 'Open Source', label: 'AI Models' },
+];
+
+const philosophy = [
+  {
+    icon: Target,
+    title: 'Actionable Insights',
+    desc: 'Every metric translates to a concrete coaching takeaway. No vanity numbers — just what helps you improve.',
+  },
+  {
+    icon: Shield,
+    title: 'Privacy by Design',
+    desc: 'Your interview data never leaves your machine. All transcription, analysis, and scoring happen locally with zero external API calls.',
+  },
+  {
+    icon: Cpu,
+    title: 'Open & Accessible',
+    desc: 'Built entirely with open-source models — Whisper, MediaPipe, DeepFace, spaCy. No paid tiers, no usage caps, no lock-in.',
+  },
+];
+
 export default function AboutView({ onNavigate }: { onNavigate: (view: string) => void }) {
   return (
     <motion.div
@@ -32,6 +57,7 @@ export default function AboutView({ onNavigate }: { onNavigate: (view: string) =
       transition={{ duration: 0.25 }}
       className="w-full max-w-5xl mx-auto mt-16 px-4 pb-16"
     >
+      {/* Header */}
       <div className="text-center mb-16">
         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#B9FF66]/20 text-[#B9FF66] text-xs font-semibold tracking-wider uppercase mb-6 border border-[#B9FF66]/30">
           <Sparkles className="w-3.5 h-3.5" />
@@ -46,6 +72,24 @@ export default function AboutView({ onNavigate }: { onNavigate: (view: string) =
         </p>
       </div>
 
+      {/* Stats row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+        {stats.map((s, i) => (
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 * i, duration: 0.3 }}
+            className="glass-card-premium p-5 md:p-6 text-center"
+          >
+            <s.icon className="w-5 h-5 text-[#B9FF66] mx-auto mb-2" />
+            <div className="text-2xl md:text-3xl font-bold">{s.value}</div>
+            <div className="text-xs text-slate-400 font-semibold uppercase tracking-wider mt-1">{s.label}</div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Feature cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
         {features.map((f, i) => (
           <motion.div
@@ -64,6 +108,40 @@ export default function AboutView({ onNavigate }: { onNavigate: (view: string) =
         ))}
       </div>
 
+      {/* Philosophy / Why Vocalytics */}
+      <div className="text-center mb-10">
+        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#B9FF66]/20 text-[#B9FF66] text-xs font-semibold tracking-wider uppercase mb-4 border border-[#B9FF66]/30">
+          <Sparkles className="w-3.5 h-3.5" />
+          Our Approach
+        </span>
+        <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+          Built for{' '}
+          <span className="bg-[#B9FF66] text-black px-3 py-1 rounded inline-block">Real Growth</span>
+        </h2>
+        <p className="text-base text-slate-400 max-w-xl mx-auto mb-10">
+          We believe interview coaching should be private, free, and powered by the best open-source AI.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {philosophy.map((p, i) => (
+          <motion.div
+            key={p.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 * i, duration: 0.3 }}
+            className="glass-card-premium p-6 md:p-8"
+          >
+            <div className="w-11 h-11 rounded-lg bg-[#B9FF66] border border-[#191A23] flex items-center justify-center mb-4 shadow-[2px_2px_0px_#191A23]">
+              <p.icon className="w-5.5 h-5.5 text-black" />
+            </div>
+            <h3 className="text-lg font-bold mb-2">{p.title}</h3>
+            <p className="text-sm text-slate-400 leading-relaxed">{p.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* CTA */}
       <div className="text-center">
         <button
           onClick={() => onNavigate('login')}
