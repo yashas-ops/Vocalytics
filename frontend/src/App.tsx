@@ -6,6 +6,8 @@ import ThreeDBackground from './components/ThreeDBackground';
 import UploadView from './components/UploadView';
 import DashboardView from './components/DashboardView';
 import HistoryView from './components/HistoryView';
+import AboutView from './components/AboutView';
+import WorkflowView from './components/WorkflowView';
 
 import { AnalysisReport } from './types';
 import { SAMPLE_INTERVIEWS } from './samples';
@@ -30,7 +32,7 @@ export default function App() {
     }
     return null;
   });
-  const [activeView, setActiveView] = useState<'upload' | 'dashboard' | 'history' | 'login' | 'register'>(user ? 'upload' : 'login');
+  const [activeView, setActiveView] = useState<'upload' | 'dashboard' | 'history' | 'login' | 'register' | 'about' | 'workflow'>(user ? 'upload' : 'about');
   const [authLoading, setAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeReport, setActiveReport] = useState<AnalysisReport | null>(null);
@@ -215,7 +217,7 @@ export default function App() {
           <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
 
             <div
-              onClick={() => { if (!isSimulating && user) setActiveView('upload'); }}
+              onClick={() => { if (!isSimulating) { user ? setActiveView('upload') : setActiveView('about'); } }}
               onMouseEnter={triggerBgHoverStart}
               onMouseLeave={triggerBgHoverEnd}
               className="flex items-center gap-2 cursor-pointer group"
@@ -229,6 +231,60 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-6">
+              {!user && (
+                <nav className="flex items-center gap-1 sm:gap-4">
+                  <button
+                    onClick={() => setActiveView('about')}
+                    onMouseEnter={triggerBgHoverStart}
+                    onMouseLeave={triggerBgHoverEnd}
+                    className={`relative px-3 md:px-4 py-2 text-xs md:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                      activeView === 'about' ? 'text-black dark:text-[#B9FF66] font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-[#B9FF66]'
+                    }`}
+                  >
+                    About
+                    {activeView === 'about' && (
+                      <motion.div
+                        layoutId="active-tab-line-landing"
+                        className="absolute bottom-[-17px] left-0 right-0 h-[2.5px] bg-[#191A23] dark:bg-[#B9FF66] rounded-full"
+                      />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setActiveView('workflow')}
+                    onMouseEnter={triggerBgHoverStart}
+                    onMouseLeave={triggerBgHoverEnd}
+                    className={`relative px-3 md:px-4 py-2 text-xs md:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                      activeView === 'workflow' ? 'text-black dark:text-[#B9FF66] font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-[#B9FF66]'
+                    }`}
+                  >
+                    Workflow
+                    {activeView === 'workflow' && (
+                      <motion.div
+                        layoutId="active-tab-line-landing"
+                        className="absolute bottom-[-17px] left-0 right-0 h-[2.5px] bg-[#191A23] dark:bg-[#B9FF66] rounded-full"
+                      />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => setActiveView('login')}
+                    onMouseEnter={triggerBgHoverStart}
+                    onMouseLeave={triggerBgHoverEnd}
+                    className={`relative px-3 md:px-4 py-2 text-xs md:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                      activeView === 'login' || activeView === 'register' ? 'text-black dark:text-[#B9FF66] font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-[#B9FF66]'
+                    }`}
+                  >
+                    Sign In
+                    {(activeView === 'login' || activeView === 'register') && (
+                      <motion.div
+                        layoutId="active-tab-line-landing"
+                        className="absolute bottom-[-17px] left-0 right-0 h-[2.5px] bg-[#191A23] dark:bg-[#B9FF66] rounded-full"
+                      />
+                    )}
+                  </button>
+                </nav>
+              )}
               {user && (
                 <>
                 <nav className="flex items-center gap-1 sm:gap-4">
@@ -330,6 +386,14 @@ export default function App() {
 
         <main className="flex-1 flex flex-col justify-center">
           <AnimatePresence mode="wait">
+            {activeView === 'about' && (
+              <AboutView onNavigate={setActiveView} />
+            )}
+
+            {activeView === 'workflow' && (
+              <WorkflowView onNavigate={setActiveView} />
+            )}
+
             {activeView === 'login' && (
               <motion.div
                 key="login-tab"
