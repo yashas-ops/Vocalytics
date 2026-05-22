@@ -40,7 +40,7 @@ const philosophy = [
   {
     icon: Shield,
     title: 'Privacy by Design',
-    desc: 'Your interview data never leaves your machine. All transcription, analysis, and scoring happen locally with zero external API calls.',
+    desc: 'Your recordings and data never leave your machine. All transcription, analysis, and scoring happen locally with zero external API calls.',
   },
   {
     icon: Cpu,
@@ -65,10 +65,10 @@ export default function AboutView({ onNavigate }: { onNavigate: (view: string) =
         </span>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">
           AI-Powered{' '}
-          <span className="bg-[#B9FF66] text-black px-3 py-1 rounded inline-block">Interview Practice</span>
+          <span className="bg-[#B9FF66] text-black px-3 py-1 rounded inline-block">Communication Intelligence</span>
         </h1>
         <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-          Record or upload your mock interviews and get instant, data-driven feedback on your communication skills — all running locally with zero cloud dependencies.
+          Record or upload any speaking presentation — interviews, pitches, meetings — and get instant, data-driven feedback on your confidence, delivery, and presence. All running locally with zero cloud dependencies.
         </p>
       </div>
 
@@ -119,7 +119,7 @@ export default function AboutView({ onNavigate }: { onNavigate: (view: string) =
           <span className="bg-[#B9FF66] text-black px-3 py-1 rounded inline-block">Real Growth</span>
         </h2>
         <p className="text-base text-slate-400 max-w-xl mx-auto mb-10">
-          We believe interview coaching should be private, free, and powered by the best open-source AI.
+          We believe communication coaching should be private, free, and powered by the best open-source AI.
         </p>
       </div>
 

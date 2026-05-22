@@ -5,7 +5,7 @@ const steps = [
   {
     icon: Upload,
     title: 'Upload',
-    desc: 'Upload a recorded mock interview video or record directly from your browser. We accept MP4, WebM, and MOV formats.',
+    desc: 'Upload a recorded presentation or speaking video, or record directly from your browser. We accept MP4, WebM, and MOV formats.',
     time: '~30s',
   },
   {
