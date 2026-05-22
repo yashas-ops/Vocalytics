@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Upload, BarChart3, History, Wand2, LogOut, Eye, EyeOff } from 'lucide-react';
+import { Upload, BarChart3, History, Wand2, LogOut, Eye, EyeOff, Info } from 'lucide-react';
 
 import ThreeDBackground from './components/ThreeDBackground';
 import UploadView from './components/UploadView';
@@ -306,6 +306,24 @@ export default function App() {
               {user && (
                 <>
                 <nav className="flex items-center gap-1 sm:gap-4">
+                <button
+                  onClick={() => setActiveView('about')}
+                  onMouseEnter={triggerBgHoverStart}
+                  onMouseLeave={triggerBgHoverEnd}
+                  className={`relative px-3 md:px-4 py-2 text-xs md:text-sm font-semibold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                    activeView === 'about' ? 'text-black dark:text-[#B9FF66] font-bold' : 'text-slate-500 dark:text-slate-400 hover:text-black dark:hover:text-[#B9FF66]'
+                  }`}
+                >
+                  <Info className="w-3.5 h-3.5" />
+                  <span>About</span>
+                  {activeView === 'about' && (
+                    <motion.div
+                      layoutId="active-tab-line"
+                      className="absolute bottom-[-17px] left-0 right-0 h-[2.5px] bg-[#191A23] dark:bg-[#B9FF66] rounded-full"
+                    />
+                  )}
+                </button>
+
                 <button
                   disabled={isSimulating}
                   onClick={() => setActiveView('upload')}
