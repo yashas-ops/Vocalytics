@@ -49,7 +49,7 @@ const philosophy = [
   },
 ];
 
-export default function AboutView({ onNavigate }: { onNavigate: (view: string) => void }) {
+export default function AboutView({ onNavigate, user }: { onNavigate: (view: string) => void; user?: object | null }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -144,10 +144,10 @@ export default function AboutView({ onNavigate }: { onNavigate: (view: string) =
       {/* CTA */}
       <div className="text-center">
         <button
-          onClick={() => onNavigate('login')}
+          onClick={() => onNavigate(user ? 'upload' : 'login')}
           className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-[#B9FF66] border-2 border-[#191A23] text-black font-bold text-base hover:bg-[#a8ee55] transition-all shadow-[4px_4px_0px_#191A23] dark:shadow-[4px_4px_0px_#B9FF66]"
         >
-          Get Started
+          {user ? 'Start Uploading' : 'Get Started'}
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

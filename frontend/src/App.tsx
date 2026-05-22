@@ -423,7 +423,7 @@ export default function App() {
         <main className="flex-1 flex flex-col justify-center">
           <AnimatePresence mode="wait">
             {activeView === 'about' && (
-              <AboutView onNavigate={setActiveView} />
+              <AboutView onNavigate={setActiveView} user={user} />
             )}
 
             {activeView === 'workflow' && (
